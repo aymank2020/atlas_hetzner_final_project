@@ -113,7 +113,7 @@ run:
   skip_policy_lexical_checks_on_unchanged_labels: true
   ignore_timestamp_policy_errors_when_adjust_disabled: false
   ignore_no_action_standalone_policy_error: true
-  max_segment_duration_sec: 10.0
+  max_segment_duration_sec: 20.0
   # Pre-submit compare
   pre_submit_chat_compare_enabled: true
   pre_submit_chat_compare_required: true
@@ -208,7 +208,7 @@ atlas:
   timestamp_max_clicks_per_segment: 30
   selectors:
     email_input: '#email || input#email || input[type="email"] || input[autocomplete="email"]'
-    start_button: 'button:has-text("Start Earning Today") || button[type="submit"]'
+    start_button: 'button[type="submit"] || button:has-text("Start") || button:has-text("Earning") || button:has-text("Begin") || button:has-text("Join") || button:has-text("Sign") || button:has-text("Log in") || button:has-text("Continue") || form >> button || button.bg-gradient-to-r'
     otp_input: '#code || input#code || input[inputmode="numeric"] || input[placeholder="000000"]'
     verify_button: 'button:has-text("Verify") || button[type="submit"]'
     tasks_nav: 'a[href*="/tasks"] || a:has-text("Tasks") || button:has-text("Tasks") || [data-testid*="tasks"]'
@@ -246,8 +246,8 @@ atlas:
 
 otp:
   provider: "gmail_imap"
-  gmail_email: ""
-  gmail_app_password: ""
+  gmail_email: "danatimer2050@gmail.com"
+  gmail_app_password: "alwbpvvsztaorzhi"
   mailbox: "[Gmail]/All Mail"
   imap_host: "imap.gmail.com"
   imap_port: 993

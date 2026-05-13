@@ -774,10 +774,37 @@ def ensure_logged_in(page: Page, cfg: Dict[str, Any]) -> None:
             raise RuntimeError("Could not fill Atlas email input.")
         page.wait_for_timeout(1200)
         # Try a more aggressive start button search if needed
-        if not _legacy._safe_locator_click(page, start_sel, timeout_ms=15000):
-            print("[auth] standard start_button selector failed; trying fallback generic submit button.")
-            if not _legacy._safe_locator_click(page, 'button[type="submit"]', timeout_ms=5000):
-                 raise RuntimeError("Could not click Atlas start button.")
+        click_success = False
+        if _legacy._safe_locator_click(page, start_sel, timeout_ms=15000):
+            click_success = True
+        else:
+            print("[auth] standard start_button selector failed; trying fallback JS click.")
+            # Fallback: JS-based click to bypass any interception
+            try:
+                for s in start_sel.split(' || '):
+                    try:
+                        loc = page.locator(s).first
+                        if loc.is_visible(timeout=2000):
+                            loc.evaluate("el => el.click()")
+                            click_success = True
+                            print(f"[auth] successful JS click on: {s}")
+                            break
+                    except Exception:
+                        continue
+                
+                if not click_success:
+                    # Final attempt on generic submit
+                    try:
+                        page.locator('button[type="submit"]').first.evaluate("el => el.click()")
+                        click_success = True
+                        print("[auth] successful JS click on fallback submit button.")
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+        
+        if not click_success:
+             raise RuntimeError("Could not click Atlas start button.")
     else:
         print("[auth] atlas.email not set; relying on existing logged-in session/profile only.")
         if "/login" in page.url.lower() or "/verify" in page.url.lower():
@@ -816,7 +843,35 @@ def ensure_logged_in(page: Page, cfg: Dict[str, Any]) -> None:
             code = _resolve_otp_code(cfg, started_at, min_uid=otp_uid_watermark)
             if not _legacy._safe_fill(page, otp_sel, code, timeout_ms=8000):
                 raise RuntimeError("Could not fill OTP code.")
-            if not _legacy._safe_locator_click(page, verify_sel, timeout_ms=8000):
+            # Aggressive verify button click
+            verify_success = False
+            if _legacy._safe_locator_click(page, verify_sel, timeout_ms=10000):
+                verify_success = True
+            else:
+                print("[auth] standard verify_button selector failed; trying fallback JS click.")
+                try:
+                    for s in verify_sel.split(' || '):
+                        try:
+                            loc = page.locator(s).first
+                            if loc.is_visible(timeout=2000):
+                                loc.evaluate("el => el.click()")
+                                verify_success = True
+                                print(f"[auth] successful JS click on verify: {s}")
+                                break
+                        except Exception:
+                            continue
+                    if not verify_success:
+                        # Final attempt on generic submit
+                        try:
+                            page.locator('button[type="submit"]').first.evaluate("el => el.click()")
+                            verify_success = True
+                            print("[auth] successful JS click on fallback verify submit button.")
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+            
+            if not verify_success:
                 raise RuntimeError("Could not click Verify button.")
 
     _wait_until_authenticated(page, cfg, timeout_sec=timeout_sec)

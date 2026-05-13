@@ -225,7 +225,7 @@ atlas:
   timestamp_max_clicks_per_segment: 30
   selectors:
     email_input: '#email || input#email || input[type="email"] || input[autocomplete="email"]'
-    start_button: 'button:has-text("Start Earning Today") || button[type="submit"]'
+    start_button: 'button[type="submit"] || button:has-text("Start") || button:has-text("Earning") || button:has-text("Begin") || button:has-text("Join") || button:has-text("Sign") || button:has-text("Log in") || button:has-text("Continue") || form >> button || button.bg-gradient-to-r'
     otp_input: '#code || input#code || input[inputmode="numeric"] || input[placeholder="000000"]'
     verify_button: 'button:has-text("Verify") || button[type="submit"]'
     tasks_nav: 'a[href*="/tasks"] || a:has-text("Tasks") || button:has-text("Tasks") || [data-testid*="tasks"]'
