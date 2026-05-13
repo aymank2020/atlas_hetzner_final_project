@@ -12,6 +12,12 @@ $ErrorActionPreference = "Stop"
 $ProjectRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $ProjectRoot
 
+# Activate venv if available
+$VenvActivate = Join-Path $ProjectRoot ".venv\Scripts\Activate.ps1"
+if (Test-Path $VenvActivate) {
+    & $VenvActivate
+}
+
 # Load .env if present
 if (Test-Path ".env") {
     Get-Content ".env" | ForEach-Object {
