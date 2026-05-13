@@ -1,0 +1,480 @@
+# ========================================================================
+# Atlas Solver - Hetzner CX43 Production Config
+# ========================================================================
+# Headless Chrome via Xvfb, single-tab mode.
+# Account: danatimer
+# Mode: REAL execution
+# ========================================================================
+
+browser:
+  headless: true
+  slow_mo_ms: 0
+  storage_state_path: ".state/atlas_auth_danatimer.json"
+  force_login: false
+  use_chrome_profile: false
+  restore_state_in_profile_mode: false
+  fallback_to_isolated_context_on_profile_error: false
+  profile_launch_timeout_ms: 30000
+  close_chrome_before_profile_launch: false
+  profile_launch_retry_count: 1
+  profile_launch_retry_delay_sec: 2.0
+  clone_chrome_profile_to_temp: false
+  reuse_existing_cloned_profile: false
+  prefer_profile_with_atlas_cookies: false
+  chrome_channel: "chrome"
+  chrome_user_data_dir: ".state/gemini_chat_user_data"
+  chrome_profile_directory: "Default"
+  proxy_server: ""
+  proxy_username: ""
+  proxy_password: ""
+  proxy_bypass: ""
+  clear_env_proxy_for_backend_requests: true
+
+run:
+  dry_run: false
+  max_segments: 0
+  max_episodes_per_run: 5
+  no_task_retry_count: 4
+  no_task_retry_delay_sec: 20.0
+  no_task_backoff_factor: 1.6
+  no_task_max_delay_sec: 180.0
+  keep_alive_when_idle: false
+  keep_alive_idle_cycle_pause_sec: 60.0
+  reserve_cooldown_sec: 120
+  reserve_min_interval_sec: 90
+  reserve_wait_only_on_rate_limit: true
+  skip_reserve_when_all_visible_blocked: true
+  clear_blocked_tasks_after_all_visible_blocked_hits: 2
+  reserve_attempts_per_visit: 1
+  reserve_label_wait_timeout_ms: 12000
+  reserve_refresh_after_click: true
+  reserve_rate_limit_wait_sec: 180
+  release_all_on_internal_error: true
+  recycle_after_max_episodes: false
+  release_all_after_batch: true
+  release_all_wait_sec: 180
+  release_and_reserve_on_submit_unverified: false
+  goto_retry_count: 3
+  goto_retry_delay_sec: 1.2
+  skip_duplicate_task_in_run: true
+  duplicate_task_retry_count: 3
+  duplicate_task_retry_wait_sec: 2.0
+  continue_on_episode_error: true
+  max_episode_failures_per_run: 20
+  episode_failure_retry_delay_sec: 4.0
+  max_video_prepare_failures_per_task: 2
+  workflow_reentry_enter_clicks: 2
+  workflow_reentry_second_click_delay_sec: 5.0
+  min_delay_between_episodes_sec: 1.5
+  max_delay_between_episodes_sec: 4.0
+  reuse_cached_labels: false
+  skip_unchanged_labels: true
+  resume_from_artifacts: false
+  resume_skip_video_steps_when_cached: false
+  resume_skip_apply_steps_when_done: false
+  allow_resume_auto_submit: false
+  execute_force_fresh_gemini: true
+  execute_force_live_segments: true
+  execute_require_video_context: true
+  # v2 episode runtime with browser isolation
+  use_episode_runtime_v2: true
+  strict_single_chat_session: true
+  force_episode_browser_isolation: true
+  sticky_episode_resume: true
+  disable_release_all_during_canary: false
+  # Single tab mode for headless server
+  single_window_two_tabs: false
+  single_window_single_tab: true
+  hold_rule_context_neighbors: 2
+  structured_episode_reports: true
+  primary_solve_backend: "chat_web"
+  chat_only_mode: true
+  targeted_repair_max_rounds: 2
+  targeted_repair_scope_neighbors: 2
+  segment_chunking_max_segments_per_request: 6
+  segment_chunking_max_window_sec: 20.0
+  segment_chunking_disable_operations: false
+  use_task_scoped_artifacts: true
+  capture_step_screenshots: true
+  capture_step_screenshots_full_page: false
+  capture_step_html: false
+  capture_step_history_limit: 16
+  enable_quality_review_submit: true
+  submit_manual_watch_enabled: true
+  submit_manual_watch_timeout_sec: 180.0
+  submit_manual_watch_poll_ms: 500
+  submit_manual_watch_log_interval_sec: 10.0
+  quality_review_submit_settle_sec: 30.0
+  submit_deep_verify_dashboard: true
+  submit_deep_verify_dashboard_timeout_sec: 30.0
+  loop_off_on_episode_open: true
+  # Policy gate
+  enable_policy_gate: true
+  block_apply_on_validation_fail: true
+  skip_policy_lexical_checks_on_unchanged_labels: true
+  ignore_timestamp_policy_errors_when_adjust_disabled: false
+  ignore_no_action_standalone_policy_error: true
+  max_segment_duration_sec: 10.0
+  # Pre-submit compare (disabled for speed on server)
+  pre_submit_chat_compare_enabled: false
+  pre_submit_chat_compare_required: false
+  pre_submit_chat_compare_model: "gemini-3.1-pro-preview"
+  pre_submit_chat_compare_block_on_chat_failure: true
+  pre_submit_chat_compare_block_when_chat_better: true
+  pre_submit_chat_compare_auto_adopt_same_timeline: true
+  pre_submit_chat_compare_same_timeline_epsilon_sec: 0.35
+  pre_submit_chat_compare_seed_discord_context: true
+  pre_submit_chat_compare_discord_context_max_messages: 120
+  pre_submit_chat_compare_discord_context_max_chars_per_message: 900
+  # Pacing
+  major_step_pause_enabled: true
+  major_step_pause_min_sec: 8.0
+  major_step_pause_max_sec: 18.0
+  # Label quality
+  min_label_words: 2
+  max_label_words: 20
+  max_atomic_actions_per_label: 2
+  forbidden_label_verbs:
+    - "inspect"
+    - "check"
+    - "look"
+    - "rotate"
+    - "grab"
+    - "reach"
+    - "examine"
+  forbidden_narrative_words:
+    - "another"
+    - "then"
+    - "next"
+    - "continue"
+    - "again"
+  tier3_label_rewrite: true
+  # Structural actions
+  enable_structural_actions: true
+  requery_after_structural_actions: true
+  max_structural_operations: 12
+  structural_allow_split: true
+  structural_allow_merge: false
+  auto_continuity_merge_enabled: false
+  structural_skip_if_segments_ge: 0
+  structural_max_failures_per_episode: 4
+  structural_wait_rows_delta_timeout_ms: 1800
+  # Timestamp adjustments
+  adjust_timestamps: true
+  timestamp_adjust_mode: "best_effort"
+  timestamp_skip_if_segments_ge: 24
+  timestamp_click_timeout_ms: 350
+  timestamp_click_pause_ms: 15
+  timestamp_max_failures_per_episode: 10
+  timestamp_max_total_clicks: 80
+  timestamp_abort_on_first_failure: false
+  timestamp_skip_disabled_buttons: true
+  # Label apply budgets
+  label_apply_progress_every: 4
+  label_apply_max_total_sec: 420
+  label_apply_max_failures: 8
+  label_apply_input_timeout_ms: 5000
+  label_apply_save_timeout_ms: 3000
+  label_apply_edit_click_timeout_ms: 2000
+  # Submit guard
+  submit_guard_enabled: true
+  submit_guard_max_failure_ratio: 0.2
+  submit_guard_min_applied_ratio: 0.90
+  submit_guard_block_on_budget_exceeded: false
+  # Video
+  play_full_video_before_labeling: false
+  play_full_video_max_wait_sec: 900
+  segment_resolve_attempts: 12
+  segment_resolve_retry_ms: 250
+  segment_resolve_sample_size: 8
+  segment_resolve_row_text_timeout_ms: 120
+  segment_extract_row_text_timeout_ms: 120
+  label_open_loading_max_checks: 5
+  label_open_loading_wait_ms: 600
+  modal_dismiss_passes: 2
+  modal_dismiss_timeout_ms: 120
+  modal_dismiss_post_click_wait_ms: 120
+  output_dir: "outputs/hetzner_production"
+  segments_dump: "atlas_segments_dump.json"
+  labels_dump: "atlas_labels_from_gemini.json"
+  prompt_dump: "atlas_prompt.txt"
+  video_dump: "atlas_task_video.mp4"
+  # Policy auto-repair
+  policy_auto_split_repair_enabled: true
+  policy_auto_split_repair_max_rounds: 5
+  policy_auto_split_repair_max_segments_per_round: 30
+
+atlas:
+  login_url: "https://audit.atlascapture.io/login?redirect=%2F"
+  dashboard_url: "https://audit.atlascapture.io/dashboard"
+  room_url: "https://audit.atlascapture.io/tasks"
+  email: ""
+  auth_timeout_sec: 180
+  wait_before_continue_sec: 1.0
+  timestamp_step_sec: 0.1
+  timestamp_max_clicks_per_segment: 30
+  selectors:
+    email_input: '#email || input#email || input[type="email"] || input[autocomplete="email"]'
+    start_button: 'button:has-text("Start Earning Today") || button[type="submit"]'
+    otp_input: '#code || input#code || input[inputmode="numeric"] || input[placeholder="000000"]'
+    verify_button: 'button:has-text("Verify") || button[type="submit"]'
+    tasks_nav: 'a[href*="/tasks"] || a:has-text("Tasks") || button:has-text("Tasks") || [data-testid*="tasks"]'
+    enter_workflow_button: 'button:has-text("Enter Standard Workflow") || text=/enter\s+standard\s+workflow/i || button:has-text("Browse Tasks") || a:has-text("Browse Tasks")'
+    continue_room_button: 'button:has-text("Continue to Room") || text=/continue\s+to\s+room/i'
+    label_button: 'button:has-text("Label") || text=/\blabel\b/i'
+    label_task_link: 'a[href*="/tasks/room/normal/label/"]'
+    reserve_episodes_button: 'button:has-text("Reserve 5 Episodes") || button:has-text("Reserve 4 Episodes") || button:has-text("Reserve 3 Episodes") || button:has-text("Reserve 2 Episodes") || button:has-text("Reserve 1 Episode") || button:has-text("Reserve 1 Episodes") || button:has-text("Reserve New Episode") || button:has-text("Reserve")'
+    confirm_reserve_button: 'button:has-text("I Understand") || button:has-text("Understand") || button:has-text("OK") || button:has-text("Okay") || button:has-text("Confirm")'
+    release_all_button: 'button:has-text("Release All") || button:has-text("Release all") || button:has-text("Release Episodes") || button:has-text("Release")'
+    confirm_release_button: 'div[role="dialog"] button:has-text("Release All") || div[role="dialog"] [role="button"]:has-text("Release All") || button:has-text("Release All") || button:has-text("Release all") || button:has-text("I Understand") || button:has-text("Understand") || button:has-text("Confirm") || button:has-text("Yes") || button:has-text("OK") || button:has-text("Okay") || text=/\bRelease\s*All\b/i'
+    error_go_back_button: 'button:has-text("Go Back") || a:has-text("Go Back") || [role="button"]:has-text("Go Back")'
+    video_element: 'video'
+    video_source: 'video source'
+    loop_toggle_button: 'button:has-text("Loop OFF") || button:has-text("Loop ON") || button[title*="Toggle segment loop"]'
+    complete_button: 'button:has-text("Complete")'
+    quality_review_modal: 'div[role="dialog"]:has-text("Quality Review") || div:has-text("Quality Review")'
+    quality_review_checkbox: 'input[type="checkbox"] || [role="checkbox"] || label:has-text("I verify that I have reviewed")'
+    quality_review_submit_button: 'button:has-text("Submit")'
+    blocking_side_panel: 'div[class*="fixed"][class*="right-4"][class*="z-50"][class*="slide-in-from-right"] || div[class*="fixed"][class*="right-4"][class*="z-50"][class*="shadow-2xl"]'
+    blocking_side_panel_close: 'button:has-text("Close") || button:has-text("Dismiss") || button:has-text("Done") || button:has-text("Cancel") || [role="button"]:has-text("Close") || button[aria-label*="close" i] || button[title*="close" i]'
+    segment_rows: 'div.space-y-1.p-2 > div.rounded-lg.border.p-3 || [data-testid*="segment"] || [data-cy*="segment"] || .segment-row || .seg-item || [class*="segment"][class*="row"]'
+    segment_label: 'p[title*="Double-click to edit"] || p.text-sm.font-medium.cursor-text || [data-testid*="label"] || [data-cy*="label"] || .segment-label || .seg-label || [class*="label"]'
+    segment_start: 'span.font-mono.text-xs || [data-testid*="start"] || [data-cy*="start"]'
+    segment_end: 'span.font-mono.text-xs.px-1\\.5.py-0\\.5 || [data-testid*="end"] || [data-cy*="end"]'
+    segment_time_plus_button: 'button:has(svg.lucide-plus)'
+    segment_time_minus_button: 'button:has(svg.lucide-minus)'
+    edit_button_in_row: 'button[title*="Edit"] || button:has-text("Edit") || [aria-label*="Edit"]'
+    split_button_in_row: 'button[title*="Split"] || [aria-label*="Split"] || button:has(svg.lucide-scissors)'
+    delete_button_in_row: 'button[title*="Delete"] || [aria-label*="Delete"] || button:has(svg.lucide-trash) || button:has(svg.lucide-trash-2)'
+    merge_button_in_row: 'button[title*="Merge"] || [aria-label*="Merge"] || button:has(svg.lucide-git-merge)'
+    action_confirm_button: 'button:has-text("Confirm") || button:has-text("Yes") || button:has-text("Delete") || button:has-text("Merge") || button:has-text("Apply") || button:has-text("Continue")'
+    label_input: 'textarea || [contenteditable="true"] || input[type="text"]'
+    save_button: 'button:has-text("Save") || button:has-text("Apply") || button:has-text("Done") || button:has-text("Submit")'
+
+otp:
+  provider: "gmail_imap"
+  gmail_email: ""
+  gmail_app_password: ""
+  mailbox: "[Gmail]/All Mail"
+  imap_host: "imap.gmail.com"
+  imap_port: 993
+  sender_hint: ""
+  subject_hint: ""
+  code_regex: "\\b(\\d{6})\\b"
+  timeout_sec: 120
+  poll_interval_sec: 4
+  max_messages: 25
+  unseen_only: false
+  lookback_sec: 300
+
+economics:
+  episode_expected_revenue_usd: 0.5
+  target_cost_ratio: 999.0
+  hard_cost_ratio: 999.0
+  enforce_cost_guards: false
+
+gemini:
+  auth_mode: chat_web
+  chat_web_url: "https://gemini.google.com/app"
+  chat_web_connect_over_cdp_url: "http://127.0.0.1:9222"
+  chat_web_cdp_connect_timeout_ms: 8000
+  chat_web_reuse_cdp_context: true
+  chat_web_preserve_existing_thread: false
+  chat_web_preserve_existing_thread_across_episodes: false
+  chat_web_clean_thread_per_episode: true
+  chat_web_clean_thread_per_request: false
+  chat_web_require_authenticated_session: true
+  chat_web_chunk_thread_reset_after_n_chunks: 8
+  chat_web_channel: "chrome"
+  chat_web_storage_state: ".state/gemini_chat_storage_state_danatimer.json"
+  chat_web_user_data_dir: ".state/gemini_chat_user_data"
+  chat_web_ignore_automation: true
+  chat_web_headless: false
+  chat_web_prefer_drive_picker: false
+  chat_web_force_clean_thread: false
+  chat_web_launch_args:
+    - '--no-sandbox'
+    - '--disable-dev-shm-usage'
+    - '--disable-gpu'
+    - '--disable-software-rasterizer'
+    - '--test-type'
+  chat_web_drive_root_folder_url: "https://drive.google.com/drive/u/0/folders/1pFpN8vcpaQltPmNKUY36Xi-2qIxhQ1bw"
+  chat_web_clean_thread_fallback_enabled: false
+  chat_web_memory_primer_file: ""
+  chat_web_seed_context_send_before_prompt: false
+  chat_web_upload_settle_min_sec: 20.0
+  chat_web_upload_settle_sec_per_100mb: 40.0
+  chat_web_upload_settle_max_sec: 240.0
+  chat_web_pre_send_ready_timeout_sec: 30.0
+  chat_web_pre_send_settle_sec: 4.0
+  chat_web_ui_model_mode: "pro"
+  chat_web_allowed_model_modes: ["pro", "thinking"]
+  chat_web_enforce_model_mode: true
+  chat_web_model_mode_settle_sec: 1.0
+  chat_web_response_stall_sec_fast: 35.0
+  chat_web_response_stall_sec_pro: 75.0
+  chat_web_response_stall_sec_thinking: 180.0
+  api_key: ""
+  fallback_api_key: ""
+  model: "gemini-3.1-pro-preview"
+  system_instruction_file: "data/gemini_policy_v1.txt"
+  system_instruction_text: ""
+  temperature: 0.0
+  candidate_count: 1
+  max_retries: 6
+  retry_base_delay_sec: 2.0
+  retry_jitter_sec: 0.8
+  max_backoff_sec: 45.0
+  connect_timeout_sec: 30
+  request_timeout_sec: 600
+  attach_video: true
+  require_video: true
+  skip_video_when_segments_le: 0
+  allow_text_only_fallback_on_network_error: false
+  price_input_per_million: 0.30
+  price_output_per_million: 2.50
+  usage_log_file: "gemini_usage.jsonl"
+  rate_limit_enabled: true
+  rate_limit_requests_per_minute: 4
+  rate_limit_window_sec: 60.0
+  rate_limit_min_interval_sec: 15.0
+  video_transport: "inline"
+  files_api_fallback_to_inline: true
+  file_ready_timeout_sec: 180
+  file_ready_poll_sec: 2.0
+  upload_request_timeout_sec: 240
+  upload_chunk_bytes: 8388608
+  upload_chunk_granularity_bytes: 8388608
+  upload_chunk_max_retries: 6
+  optimize_video_for_upload: true
+  optimize_video_only_if_larger_mb: 8.0
+  optimize_video_target_mb: 15.0
+  optimize_video_prefer_ffmpeg: true
+  optimize_video_target_fps: 10.0
+  optimize_video_min_fps: 8.0
+  optimize_video_min_width: 320
+  optimize_video_min_short_side: 320
+  optimize_video_scale_candidates: [0.75, 0.6, 0.5, 0.4, 0.33, 0.25, 0.2]
+  inline_retry_target_mb: [15.0, 10.0, 8.0, 6.0]
+  max_inline_video_mb: 20.0
+  stage_models:
+    labeling: "gemini-3.1-pro-preview"
+    repair: "gemini-3.1-pro-preview"
+    policy_retry: "gemini-3.1-pro-preview"
+    compare_api: "gemini-3.1-pro-preview"
+    compare_chat: "gemini-3.1-pro-preview"
+  gen3_fallback_models: []
+  policy_retry_model: "gemini-3.1-pro-preview"
+  chat_ops_model: "gemini-3.1-pro-preview"
+  chat_labels_model: "gemini-3.1-pro-preview"
+  chat_ops_response_schema_enabled: true
+  chat_labels_response_schema_enabled: true
+  retry_with_stronger_model_on_policy_fail: false
+  policy_retry_only_if_flash: false
+  quota_fallback_enabled: false
+  quota_fallback_max_uses_per_run: 6
+  retry_with_quota_fallback_model: false
+  quota_fallback_model: "gemini-3.1-pro-preview"
+  quota_fallback_from_models: []
+  zero_quota_model_cooldown_sec: 21600.0
+  api_keys: []
+  rotation_policy: round_robin
+  prefer_fallback_key_as_primary: false
+  retry_on_quota_429: true
+  quota_retry_default_wait_sec: 30.0
+  top_p: null
+  top_k: null
+  max_output_tokens: null
+  reference_frames_enabled: true
+  reference_frames_always: false
+  reference_frame_attach_when_video_mb_le: 2.5
+  reference_frame_count: 2
+  reference_frame_positions: [0.2, 0.55, 0.85]
+  reference_frame_max_side: 960
+  reference_frame_jpeg_quality: 82
+  reference_frame_max_total_kb: 420
+  video_download_timeout_sec: 180
+  video_download_retries: 8
+  video_download_chunk_bytes: 1048576
+  video_download_retry_base_sec: 1.2
+  video_download_use_playwright_fallback: true
+  video_candidate_scan_attempts: 8
+  video_candidate_scan_wait_ms: 1500
+  validate_video_decode: true
+  min_video_bytes: 500000
+  extra_instructions: >-
+    If floor mat vs table is unclear, do not guess raised furniture; use neutral
+    location wording. Apply the newest dense-first segmenting update: shorter
+    segments are the standard, target 2-5 seconds when the visible actions support
+    it, never exceed 10 seconds, capture task-relevant pauses, and correct the
+    existing auto-labels instead of rewriting from zero unless the draft is clearly
+    wrong.
+
+training_feedback:
+  enabled: true
+  continuous: true
+  interval_sec: 1800
+  max_cycles: 0
+  max_episodes: 20
+  root_dir: outputs/training_feedback
+  runs_subdir: runs
+  live_subdir: live
+  migrate_legacy_dirs: true
+  max_consecutive_failures: 5
+  track_t4_disputes: true
+  t4_tracker_filename: t4_tracker_state.json
+  t4_transitions_filename: t4_transitions_history.jsonl
+  t4_lessons_filename: t4_lessons_history.jsonl
+  disputes_status_filters:
+    - Disputed
+    - Awaiting T2
+    - Both OK
+  enable_alignment_review: true
+  alignment_lessons_filename: alignment_lessons_history.jsonl
+  alignment_max_episodes_in_prompt: 20
+  alignment_max_chars_per_episode: 2500
+  use_chrome_profile: false
+
+discord_training:
+  enabled: true
+  continuous: true
+  interval_sec: 900
+  max_cycles: 0
+  root_dir: outputs/training_feedback/discord
+  runs_subdir: runs
+  live_subdir: live
+  input_dir: outputs/discord_exports
+  include_subdirs: true
+  file_patterns:
+    - '*.json'
+    - '*.txt'
+  max_files_per_cycle: 120
+  max_messages_in_prompt: 350
+  max_chars_per_message: 900
+  min_new_messages_for_gemini: 1
+  channel_allowlist_ids:
+    - '1485540323584118877'
+  channel_allowlist_names:
+    - atlas-rules
+  author_allowlist:
+    - Frans
+    - Duwop
+  update_keywords:
+    - update
+    - new rule
+    - guideline
+    - forbidden
+    - must
+    - do not
+    - limit
+    - gripper
+    - coarse
+    - dense
+    - atomic
+    - hallucination
+  export_command: ''
+  export_workdir: ''
+  export_timeout_sec: 180
+  state_filename: collector_state.json
+  max_seen_ids: 50000
+  policy_override_file: data/gemini_policy_discord_live.txt

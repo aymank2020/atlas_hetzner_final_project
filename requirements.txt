@@ -1,0 +1,31 @@
+# Atlas Solver v1 - Minimal Dependencies
+# Core browser automation
+playwright>=1.40.0
+
+# Gemini chat-web interaction (lazy imports for API fallback)
+requests>=2.31.0
+
+# Config and environment
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# Video processing (ffmpeg preferred over opencv)
+# ffmpeg must be installed separately and on PATH
+# opencv-python is optional fallback only:
+# opencv-python>=4.8.0
+
+# Optional but recommended for runtime monitoring
+psutil>=5.9.0
+
+# Google auth (only needed if using service account mode)
+# google-auth>=2.20.0
+
+# Image handling (used in video optimization)
+Pillow>=10.0.0
+
+# Numerical (used in soundcard_patch, optional)
+# numpy>=1.24.0
+
+# Testing
+pytest>=7.4.0
+pytest-subtests>=0.11.0

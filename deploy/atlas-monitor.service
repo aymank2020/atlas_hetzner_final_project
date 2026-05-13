@@ -1,0 +1,28 @@
+[Unit]
+Description=Atlas Monitor Daemon - Solver watchdog and Telegram alerts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atlas
+Group=atlas
+WorkingDirectory=/srv/atlas/atlas_hetzner_final_project
+ExecStart=/srv/atlas/atlas_hetzner_final_project/.venv/bin/python -u /srv/atlas/atlas_hetzner_final_project/deploy/monitor_daemon.py
+Restart=always
+RestartSec=10
+
+# Environment
+EnvironmentFile=-/srv/atlas/atlas_hetzner_final_project/.env
+
+# Resource limits (monitor is lightweight)
+MemoryMax=256M
+TasksMax=32
+
+# Logging - monitor_daemon.py writes its own log file via _log()
+# journal captures only for systemd status inspection
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

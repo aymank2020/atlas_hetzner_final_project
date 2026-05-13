@@ -1,0 +1,16 @@
+# Canonical Atlas Policy Context
+
+Canonical policy version: atlas-discord-cra-v1
+- Maximum segment duration: 15 seconds.
+- Preferred density sweet spot: 2.0-5.0 seconds.
+- Maximum atomic actions per label: 2.
+- Maximum label words: 20.
+- Forbidden verbs: inspect, check, reach, examine.
+- Forbidden narrative words: then, another, continue, next, again.
+- Segment style preference: dense_first.
+- Correct existing labels before rewriting from scratch: yes.
+- Label task-relevant pauses inside the kept segment: yes.
+- No Action is standalone only and must not be used while a task-relevant object remains held.
+
+Recent promoted fields:
+- engine_limits.max_segment_seconds: 15.0

@@ -1,0 +1,26 @@
+[Unit]
+Description=Atlas Update Checker - Discord + Training Hub monitor (every 6h)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/srv/atlas/OCR_Atlas_annotation_final_project
+ExecStart=/srv/atlas/OCR_Atlas_annotation_final_project/.venv/bin/python -u /srv/atlas/OCR_Atlas_annotation_final_project/deploy/update_checker.py --daemon
+Restart=always
+RestartSec=30
+
+# Environment
+EnvironmentFile=-/srv/atlas/OCR_Atlas_annotation_final_project/.env
+
+# Resource limits (lightweight - just API calls)
+MemoryMax=256M
+TasksMax=16
+
+# Logging - update_checker.py writes its own log file
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

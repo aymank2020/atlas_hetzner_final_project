@@ -1,0 +1,163 @@
+# AUTO-GENERATED FROM DISCORD UPDATES
+# generated_at: 2026-04-24T16:30:00.000000
+# source_messages: 102608
+# harvest_window: 2026-03-27 to 2026-04-24
+# channels: level-3-announcements, level-3-questions, atlas-announcements, faqs
+# admin_rule_messages: 490
+
+## OFFICIAL ANNOUNCEMENTS (Level-3 + Atlas)
+
+### 2026-03-27 | sentientcake | Segmenting Update - New Guidelines
+- Shorter segments are the new standard
+- Max segment duration: 10 seconds
+- Sweet spot: 2-5 seconds
+- Label all actions and pauses within each segment
+- Dense is better - we want as much granularity as possible
+- Auto-labels are improving; going forward you'll mostly be correcting labels
+- No penalties for past work done before this change
+
+### 2026-04-04 | juphams | Spamming and Account Actions
+- Spamming is strictly prohibited
+- Repeated low quality submissions, misuse of the system, or attempts to bypass guidelines = immediate account action
+- Repeated violations may lead to permanent account restrictions
+
+### 2026-04-05 | shangccic | Clock In Disclaimer
+- Clock In feature is for approved work only
+- Clocking in without approved task or prior authorization = disciplinary action
+
+### 2026-04-14 | sharingcaring | 10-Second Rule Confirmation
+- "We still follow the rules for 10 second maximum"
+- Despite UI showing red marker at 20 seconds, the RULE is still 10 seconds max
+
+---
+
+## ADMIN/MOD LABELING RULES (Extracted from level-3-questions)
+
+### HOLD RULE CLARIFICATIONS
+
+1. **Hold is required when object is NOT referenced in another action** (jujumu007, 2026-03-27)
+   - "hold is necessary when there is an object in the ego's hand that is not referenced elsewhere in the label"
+   - Example: "pick up cup, hold wrench" (wrench not in pick up action)
+   - "pick up cup" does NOT need "hold cup" - that's redundant
+
+2. **Hold labeled when action is not done on the held item** (austin._._0, 2026-03-28)
+   - "Hold is always labelled when an action is not done on the item being held"
+
+3. **Next segment doesn't know previous context** (_josephgreenwood, 2026-03-29)
+   - "According to the new rules, the next segment doesn't know what happened in previous segments"
+   - "That's why we label hold in every segment where an object is not involved in an action"
+
+4. **Hold exception for quick pick-place** (_josephgreenwood, 2026-03-29)
+   - "There's an exception for this hold rule, only instances like this tho when pick up and place happens in 1 second"
+   - "If the place action can be split and labeled on next segment, avoid mixing"
+
+5. **Do not hold if object is already in the action** (_josephgreenwood, multiple dates)
+   - "Don't hold if the shirt is already included in the action"
+   - "No need to hold if the spray bottle is already accounted for on the action"
+   - "If both items are accounted for in the action on that segment no need to hold"
+
+6. **Hold is not needed for non-task-relevant objects** (austin._._0, 2026-03-27)
+   - "No need to label the holding desk. It's irrelevant to the goal."
+   - "Only label hold when the ego is holding it in his palm"
+
+### DENSE VS COARSE RULES
+
+1. **Dense is now strongly preferred** (austin._._0, multiple dates)
+   - "We appreciate more of dense labelling now"
+   - "Please, go dense. Split on any hand disengagement. This will reduce hallucinations"
+   - "Dense is the best now"
+
+2. **Go dense because it's safer** (m.xssx, 2026-03-27)
+   - "I said go dense because it is safer"
+   - "You should use dense in all the labels, it is good"
+   - "It captures all actions and we are to cover all actions in the videos"
+
+3. **Coarse only in specific cases** (austin._._0, m.xssx)
+   - "If it's a continuous and repetitive action. Then label coarse" (austin._._0, 2026-03-27)
+   - "You can go coarse if the segment is too short to split" (m.xssx, 2026-03-27)
+   - In a coarse label, pick up and place actions are covered by the label (_josephgreenwood, 2026-03-28)
+
+4. **Do not mix dense and coarse** (m.xssx, 2026-03-27)
+   - Adding 'hold' with a coarse 'move' = mixing dense with coarse
+   - "move potato to countertop should be good; if you add hold, you will be mixing dense with coarse"
+
+### ATOMIC ACTION AND SPLIT RULES
+
+1. **Max 2 atomic actions per segment** (m.xssx, 2026-03-28)
+   - "For now, two actions per segment. If the actions are more than 2, you should split"
+
+2. **Separate actions with comma** (m.xssx, 2026-03-27)
+   - "Separate actions with a comma, do not say 'pick up book and place on table'"
+
+3. **Segments must not exceed 10 seconds** (m.xssx, 2026-03-28)
+   - "All segments must not be more than 10 seconds, it is even best if it is 2 to 5 seconds"
+   - "Whether hand disengagement or not, new rules say segments should not be more than 10 seconds"
+   - "If the action is repeated, you can split and give it same labels"
+
+4. **Split on disengagement** (austin._._0, 2026-03-27)
+   - "Split on any hand disengagement. This will reduce hallucinations"
+
+### PLACE RULE
+
+1. **Place MUST include location** (jujumu007, 2026-03-31)
+   - "Location + object should ALWAYS be included for the MOST accuracy. ESPECIALLY for 'place'"
+   - "You will be penalized if you do not say what location something was moved too or placed on"
+
+### NO ACTION RULE
+
+1. **Hands on task-relevant object = never No Action** (_josephgreenwood, 2026-03-28)
+   - "As long as ego's hands are in contact with a task relevant object, that's never a no action"
+
+### INTENT RULE
+
+1. **Do not label intent with "to"** (m.xssx, 2026-03-29)
+   - "Do not label and add 'to' to show what ego wants to do after"
+   - "Do not say 'pick up shirt to fold' or 'dip knife in water to rinse'"
+   - "Label every micro action"
+
+### FORMAT RULES
+
+1. **No articles** (austin._._0, 2026-03-27)
+   - "Don't label with articles"
+   - Example: "Pull pink mat" not "Pull the pink mat"
+
+2. **Consistent nouns throughout episode** (austin._._0, 2026-03-29)
+   - "Please remember to maintain adjective and noun consistency throughout the episode"
+
+3. **Do not summarize actions** (m.xssx, 2026-03-28)
+   - "Try to label every action, do not 'summarise'"
+
+4. **Always name the object** (m.xssx, 2026-03-27)
+   - Do not use "it" - always name the object explicitly
+
+### QUALITY AND PLATFORM RULES
+
+1. **Use PC, not mobile** (austin._._0, 2026-04-11)
+   - "Labelling with mobile phone is not advised as this will affect quality of work"
+   - "You are advised to use a PC and a stable Internet connection"
+
+2. **Below 50% accuracy = bad** (m.xssx, 2026-04-07)
+   - "There is a range for good work and below 50% is bad"
+
+3. **Dispute if T3 reviewer wrongly labels** (m.xssx, 2026-03-29)
+   - "Those at the top do not use new rules when spot checking"
+   - "If T3 wrongly labels your work, you can dispute"
+
+---
+
+## COMPREHENSIVE NEW RULES SUMMARY (m.xssx, 2026-03-29)
+Direct quote from admin summarizing all new rules:
+
+> 1. A segment should not be more than 10 seconds. This means even if ego is doing the same action, split it
+> 2. Each segment should have only two actions, if they are more than two, you split them. E.g. in a segment you should have something like this 'pick up cup, place cup on table'
+> 3. You should label every hold. If ego is holding an object and not using it, label it. For example ego was wiping a cup with cloth and placed it in the drying rack, you label like this:
+>    - wipe cup with cloth
+>    - [split]
+>    - hold cloth, place cup on rack
+
+---
+
+# SYNC METADATA
+# Last sync: 2026-04-24T16:30:00
+# Harvest file: outputs/discord_exports/harvest_2026-03-27_to_now_20260424_161951.json
+# Processing: outputs/discord_processed/

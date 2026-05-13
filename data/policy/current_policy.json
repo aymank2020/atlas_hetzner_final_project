@@ -1,0 +1,99 @@
+{
+  "policy_version": "atlas-discord-cra-v1",
+  "generated_at": "2026-04-08T14:16:27.996080+00:00",
+  "effective_at": "2026-04-08T14:16:27.996080+00:00",
+  "authority_mode": "trusted_auto",
+  "engine_limits": {
+    "max_segment_seconds": 10.0
+  },
+  "annotation": {
+    "preferred_density_sec": {
+      "min": 2.0,
+      "max": 5.0
+    },
+    "max_atomic_actions": 2,
+    "max_label_words": 20
+  },
+  "merge_rules": {
+    "tolerance_sec": 0.5,
+    "max_combined_duration_seconds": 60.0
+  },
+  "lexicon": {
+    "forbidden_verbs": [
+      "inspect",
+      "check",
+      "reach",
+      "examine"
+    ],
+    "forbidden_narrative_words": [
+      "then",
+      "another",
+      "continue",
+      "next",
+      "again"
+    ],
+    "disallowed_tool_terms": [
+      "mechanical arm",
+      "robotic arm",
+      "robot arm",
+      "manipulator",
+      "robot gripper",
+      "claw arm"
+    ]
+  },
+  "behavior": {
+    "no_action_standalone": true,
+    "no_action_forbidden_while_holding": true,
+    "merge_identical_consecutive": true,
+    "hold_rule_mode": "task_relevant_only",
+    "segment_style": "dense_first",
+    "correct_existing_labels_preferred": true,
+    "label_task_relevant_pauses_within_segment": true
+  },
+  "runtime": {
+    "universal_rules": [
+      "Use the canonical policy values below over any stale prompt wording.",
+      "Shorter segments are the current standard: aim for 2-5 seconds and never exceed 10 seconds.",
+      "Prefer dense, granular corrections when the visible actions support it; dense is better than overly coarse rewrites.",
+      "Treat current employee labels as drafts to correct, not text to discard by default.",
+      "Within each kept segment, capture all task-relevant actions and pauses.",
+      "No Action is standalone only and is forbidden while a task-relevant object is still held.",
+      "Each label should keep at most 2 atomic actions and 20 words."
+    ]
+  },
+  "sources": [
+    {
+      "rule_id": "1479275809662570506|annotation.max_atomic_actions|2026-03-06t00:33:56.639000+00:00",
+      "message_id": "1479275809662570506",
+      "timestamp": "2026-03-06T00:33:56.639000+00:00",
+      "channel": "#LEVEL3_ANNOUNCEMENT",
+      "author": "sentientcake",
+      "trust_tier": "trusted_auto",
+      "field_path": "annotation.max_atomic_actions",
+      "value": 2
+    },
+    {
+      "rule_id": "1487171215255670966|engine_limits.max_segment_seconds|2026-03-27t19:27:28.022000+00:00",
+      "message_id": "1487171215255670966",
+      "timestamp": "2026-03-27T19:27:28.022000+00:00",
+      "channel": "#LEVEL3_ANNOUNCEMENT",
+      "author": "sentientcake",
+      "trust_tier": "trusted_auto",
+      "field_path": "engine_limits.max_segment_seconds",
+      "value": 10.0
+    },
+    {
+      "rule_id": "1487171215255670966|annotation.preferred_density_sec|2026-03-27t19:27:28.022000+00:00",
+      "message_id": "1487171215255670966",
+      "timestamp": "2026-03-27T19:27:28.022000+00:00",
+      "channel": "#LEVEL3_ANNOUNCEMENT",
+      "author": "sentientcake",
+      "trust_tier": "trusted_auto",
+      "field_path": "annotation.preferred_density_sec",
+      "value": {
+        "min": 2.0,
+        "max": 5.0
+      }
+    }
+  ]
+}

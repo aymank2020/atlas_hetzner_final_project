@@ -1,0 +1,26 @@
+base_config: ../production_hetzner.yaml
+
+scheduler:
+  mode: sequential
+  max_parallel_accounts: 1
+  episodes_per_account_per_turn: 5
+  cooldown_between_accounts_sec: 45
+  rest_between_turns_sec: 45
+  loop_pause_sec: 0
+  skip_unready_accounts: true
+  continue_on_error: true
+  per_account_timeout_sec: 0
+
+accounts:
+  - name: danatimer
+    config: danatimer.yaml
+    enabled: true
+  - name: wafaabayoumi
+    config: wafaabayoumi.yaml
+    enabled: false
+  - name: amirakamelkorany
+    config: amirakamelkorany.yaml
+    enabled: false
+  - name: badrbayoumi865
+    config: badrbayoumi865.yaml
+    enabled: false

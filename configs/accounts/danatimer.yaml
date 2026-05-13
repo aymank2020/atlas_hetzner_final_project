@@ -1,0 +1,55 @@
+runner:
+  env_clear:
+    - ATLAS_LOGIN_EMAIL
+    - ATLAS_EMAIL
+    - GMAIL_EMAIL
+    - GMAIL_USER
+    - GMAIL_APP_PASSWORD
+    - GEMINI_API_KEY
+    - GOOGLE_API_KEY
+    - GEMINI_API_KEY_FALLBACK
+    - GOOGLE_API_KEY_FALLBACK
+    - GEMINI_API_KEY_SECONDARY
+    - GOOGLE_API_KEY_SECONDARY
+    - GEMINI_API_KEYS_POOL
+    - GEMINI_API_KEYS_FREE_POOL
+    - GEMINI_API_KEY_FREE_OPS
+    - GEMINI_API_KEY2_FREE_OPS2
+    - GEMINI_API_KEY_FREE_FALLBACK
+    - GEMINI_API_KEY_OPS
+  env_map:
+    ATLAS_LOGIN_EMAIL: ATLAS_LOGIN_EMAIL1
+    ATLAS_EMAIL: ATLAS_EMAIL1
+    GMAIL_EMAIL: GMAIL_EMAIL1
+    GMAIL_USER: GMAIL_USER1
+    GMAIL_APP_PASSWORD: GMAIL_APP_PASSWORD1
+    GEMINI_API_KEY: GEMINI_API_KEY_FREE_FALLBACK2
+    GOOGLE_API_KEY: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY_FALLBACK: GEMINI_API_KEY_FREE_FALLBACK2
+    GOOGLE_API_KEY_FALLBACK: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY_SECONDARY: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEYS_POOL: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEYS_FREE_POOL: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY_FREE_OPS: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY2_FREE_OPS2: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY_FREE_FALLBACK: GEMINI_API_KEY_FREE_FALLBACK2
+    GEMINI_API_KEY_OPS: GEMINI_API_KEY_FREE_FALLBACK2
+
+browser:
+  headless: true
+  use_chrome_profile: false
+  restore_state_in_profile_mode: false
+  storage_state_path: ".state/accounts/danatimer/atlas_auth.json"
+
+run:
+  output_dir: "outputs/danatimer"
+
+gemini:
+  api_keys: []
+  rotation_policy: round_robin
+  prefer_fallback_key_as_primary: false
+  quota_fallback_enabled: true
+  quota_fallback_max_uses_per_run: 6
+  retry_with_quota_fallback_model: false
+  quota_fallback_model: gemini-3.1-pro-preview
+  quota_fallback_from_models: []

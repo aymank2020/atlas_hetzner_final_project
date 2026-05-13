@@ -1,0 +1,10 @@
+{
+  "policy_version": "atlas-discord-cra-v1",
+  "generated_at": "2026-04-08T14:16:27.997074+00:00",
+  "changed_fields": [],
+  "promoted_rule_ids": [
+    "1479275809662570506|annotation.max_atomic_actions|2026-03-06t00:33:56.639000+00:00",
+    "1487171215255670966|engine_limits.max_segment_seconds|2026-03-27t19:27:28.022000+00:00",
+    "1487171215255670966|annotation.preferred_density_sec|2026-03-27t19:27:28.022000+00:00"
+  ]
+}

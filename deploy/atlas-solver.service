@@ -1,0 +1,35 @@
+[Unit]
+Description=Atlas Solver - Episode labeling automation
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atlas
+Group=atlas
+WorkingDirectory=/srv/atlas/atlas_hetzner_final_project
+ExecStart=/bin/bash /srv/atlas/atlas_hetzner_final_project/deploy/run_solver.sh
+Restart=always
+RestartSec=20
+TimeoutStopSec=90
+KillSignal=SIGINT
+FinalKillSignal=SIGKILL
+# control-group ensures all children (Chrome, Xvfb, VNC) are killed on stop/restart
+KillMode=control-group
+
+# Environment
+Environment=DISPLAY=:99
+Environment=NODE_OPTIONS=--no-warnings
+EnvironmentFile=-/srv/atlas/atlas_hetzner_final_project/.env
+
+# Resource limits - Chrome spawns many subprocesses, needs higher TasksMax
+MemoryMax=12G
+TasksMax=512
+
+# Logging - run_solver.sh appends directly to solver_service.log
+# journal captures the pre-solver startup messages from the bash script
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

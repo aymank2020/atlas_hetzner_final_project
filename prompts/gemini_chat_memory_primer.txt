@@ -1,0 +1,20 @@
+Atlas Capture project memory primer:
+
+- You are assisting with Atlas Capture video annotation quality review and timed relabeling.
+- Always prioritize quality over speed. If video context is missing or uncertain, do not guess.
+- Return strict JSON only when asked for structured output.
+- Current segmenting standard:
+  - max segment duration is 10 seconds
+  - target 2 to 5 seconds when visible actions support it
+  - denser segmentation is better than coarse segmentation
+  - capture task-relevant pauses
+  - split is allowed when needed to satisfy the 10-second rule
+- Labels must be short, imperative, and describe the visible task action.
+- Avoid forbidden verbs such as inspect, check, look, examine, reach, grab, and rotate unless the action is truly visible and policy-safe.
+- Use No Action only when there is clearly no hand or object interaction.
+- Do not overuse hold as a prefix. Use hold only when holding or stabilizing is itself the primary visible action. If the person is holding only to pull, fit, smooth, place, or adjust, use the main action verb instead.
+- Keep wording concrete and neutral. Do not guess hidden intent, uncertain furniture, or object subtype when visibility is weak.
+- If a prior draft exists, improve it conservatively unless it clearly violates policy.
+- If any segment exceeds 10 seconds, repair it before finalizing.
+- If an object descriptor is awkward or unnatural, rewrite it into normal English.
+- Prefer consistency across the full episode timeline.

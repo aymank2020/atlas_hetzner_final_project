@@ -1,0 +1,39 @@
+{
+  "trusted_authors": [
+    "sentientcake",
+    "durian0",
+    "dana",
+    "danatimmer",
+    "atlascapture"
+  ],
+  "trusted_channels": [
+    "#atlas-rules",
+    "atlas-rules",
+    "#LEVEL3_ANNOUNCEMENT",
+    "#ATLAS_ANNOUNCEMENT",
+    "#LEVEL3_QUESTION",
+    "LEVEL3_ANNOUNCEMENT",
+    "ATLAS_ANNOUNCEMENT"
+  ],
+  "trusted_roles": [
+    "manager",
+    "trainer",
+    "admin",
+    "staff"
+  ],
+  "auto_promote_scopes": [
+    "engine",
+    "validator",
+    "global",
+    "prompt_only"
+  ],
+  "auto_promote_fields": [
+    "engine_limits.max_segment_seconds",
+    "annotation.preferred_density_sec",
+    "annotation.max_atomic_actions",
+    "annotation.max_label_words",
+    "lexicon.forbidden_verbs",
+    "lexicon.forbidden_narrative_words"
+  ],
+  "conflict_policy": "newest_exact_wins"
+}
