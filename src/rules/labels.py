@@ -1185,6 +1185,9 @@ def _normalize_segment_plan(
             "label": label,
             "start_sec": round(start_sec, 3),
             "end_sec": round(end_sec, 3),
+            "confidence": _safe_float(item.get("confidence"), 1.0),
+            "escalation_flag": bool(item.get("escalation_flag", False)),
+            "audit_risk": item.get("audit_risk", {}),
         }
 
     for idx, source in source_by_idx.items():
@@ -1213,6 +1216,9 @@ def _normalize_segment_plan(
             "label": source_label,
             "start_sec": round(_safe_float(source.get("start_sec", 0.0), 0.0), 3),
             "end_sec": round(_safe_float(source.get("end_sec", 0.0), 0.0), 3),
+            "confidence": 1.0,
+            "escalation_flag": False,
+            "audit_risk": {"level": "low", "reasons": []},
         }
 
     # Re-run hold-rule enforcement against the fully built plan so forward
@@ -1238,6 +1244,10 @@ def _normalize_segment_plan(
 
     if not out:
         raise ValueError("Gemini returned no usable segment plan")
+        
+    from src.rules.label_autofix import apply_autofix_to_plan
+    out = apply_autofix_to_plan(out, effective_cfg)
+    
     return out
 
 

@@ -92,7 +92,8 @@ def _signal_handler(sig, frame):
     _running = False
 
 
-signal.signal(signal.SIGTERM, _signal_handler)
+if hasattr(signal, "SIGTERM"):
+    signal.signal(signal.SIGTERM, _signal_handler)
 signal.signal(signal.SIGINT, _signal_handler)
 
 # ---------------------------------------------------------------------------

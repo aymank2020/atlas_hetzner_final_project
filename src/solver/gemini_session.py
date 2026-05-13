@@ -85,6 +85,9 @@ def _extract_payload_segments(payload: Any) -> List[Dict[str, Any]]:
                 "start_sec": start_sec,
                 "end_sec": end_sec,
                 "label": str(item.get("label", item.get("current_label", "")) or "").strip(),
+                "confidence": _safe_float(item.get("confidence"), 1.0),
+                "escalation_flag": bool(item.get("escalation_flag", False)),
+                "audit_risk": item.get("audit_risk", {}),
             }
         )
     return out

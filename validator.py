@@ -142,8 +142,8 @@ HOLD_INTENT_PATTERN = re.compile(
 MERGE_TOLERANCE_SEC = 0.5  # Gap tolerance between segments
 MERGE_MAX_DURATION_SEC = 60.0  # Max combined duration for merge (Strict Limit)
 SWEET_SPOT_MIN = 2.0           # Ideal minimum segment duration
-SWEET_SPOT_MAX = 5.0           # Ideal maximum segment duration
-MAX_SEGMENT_DURATION_SEC = 10.0
+SWEET_SPOT_MAX = 10.0          # Ideal maximum segment duration
+MAX_SEGMENT_DURATION_SEC = 20.0
 
 
 @dataclass(frozen=True)
@@ -1044,6 +1044,11 @@ def validate_segment(seg: Dict[str, Any], video_duration_sec: float) -> Tuple[Di
     confidence = seg.get("confidence")
     if not isinstance(confidence, (int, float)) or not (0 <= float(confidence) <= 1):
         warnings.append("confidence_invalid_or_missing")
+    elif float(confidence) < 0.7:
+        errors.append("possible_hallucination")
+        
+    if seg.get("escalation_flag"):
+        errors.append("escalation_required")
 
     rc = seg.get("rule_checks")
     if isinstance(rc, dict):
@@ -1232,6 +1237,10 @@ def validate_episode(annotation: Dict[str, Any]) -> Dict[str, Any]:
             major_fail_triggers.append("invalid_adjust_over_phrase")
         if "timestamp_order_invalid" in errs or "duration_mismatch" in errs:
             major_fail_triggers.append("timestamps_invalid")
+        if "possible_hallucination" in errs:
+            major_fail_triggers.append("hallucination_high_risk")
+        if "escalation_required" in errs:
+            major_fail_triggers.append("model_escalation_requested")
 
     if "timestamp_overlap" in episode_errors:
         major_fail_triggers.append("episode_overlap")

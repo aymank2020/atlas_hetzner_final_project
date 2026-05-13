@@ -27,6 +27,7 @@ class RetryReason:
     DESYNC = "desync"
     SUBMIT_GUARD = "submit_guard"
     PAGE_CRASH = "page_crash"
+    LOW_CONFIDENCE = "low_confidence"
     UNKNOWN = "unknown"
 
 
@@ -38,6 +39,7 @@ class FailureClass:
     APPLY_FAILURE = "apply_failure"
     SUBMIT_GUARD_BLOCK = "submit_guard_block"
     SUBMIT_VERIFICATION_FAILURE = "submit_verification_failure"
+    HALLUCINATION_FAILURE = "hallucination_failure"
 
 
 TRANSPORT_BACKOFF_SECONDS: List[float] = [1.0, 3.0, 7.0]

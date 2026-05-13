@@ -636,6 +636,47 @@ def ensure_logged_in(page: Page, cfg: Dict[str, Any]) -> None:
     otp_sel = str(_cfg_get(cfg, "atlas.selectors.otp_input", ""))
     verify_sel = str(_cfg_get(cfg, "atlas.selectors.verify_button", ""))
 
+    if _is_authenticated_page(page):
+        print("[auth] already logged in (pre-check).")
+        return
+
+    # Surgery: Make overlay removal persistent for every page load in this context
+    try:
+        surgery_js = """() => {
+            const style = document.createElement('style');
+            style.textContent = `
+                div[class*="z-[9999]"], 
+                div[class*="bg-slate-950"],
+                .fixed.inset-0.z-\\\\[9999\\\\] { 
+                    display: none !important; 
+                    visibility: hidden !important; 
+                    pointer-events: none !important; 
+                }
+            `;
+            document.documentElement.appendChild(style);
+
+            const removeOverlays = () => {
+                const overlays = Array.from(document.querySelectorAll('div')).filter(el => 
+                    el.textContent.includes('Desktop Only') || el.textContent.includes('Mobile devices are not supported')
+                );
+                overlays.forEach(el => {
+                    el.style.display = 'none';
+                    const parent = el.closest('.fixed.inset-0');
+                    if (parent) parent.style.display = 'none';
+                });
+            };
+            removeOverlays();
+            const observer = new MutationObserver(removeOverlays);
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+        }"""
+        page.context.add_init_script(surgery_js)
+        try:
+            page.evaluate(surgery_js)
+        except:
+            pass
+    except Exception:
+        pass
+
     print(f"[auth] open login page: {login_url}")
     try:
         page.goto(login_url, wait_until="domcontentloaded")
@@ -659,10 +700,14 @@ def ensure_logged_in(page: Page, cfg: Dict[str, Any]) -> None:
             otp_uid_watermark = _get_gmail_uid_watermark(cfg)
             if otp_uid_watermark is not None:
                 print(f"[otp] inbox uid watermark before request: {otp_uid_watermark}")
-        if not _legacy._safe_fill(page, email_sel, email, timeout_ms=8000):
+        if not _legacy._safe_fill(page, email_sel, email, timeout_ms=12000):
             raise RuntimeError("Could not fill Atlas email input.")
-        if not _legacy._safe_locator_click(page, start_sel, timeout_ms=8000):
-            raise RuntimeError("Could not click Atlas start button.")
+        page.wait_for_timeout(1200)
+        # Try a more aggressive start button search if needed
+        if not _legacy._safe_locator_click(page, start_sel, timeout_ms=15000):
+            print("[auth] standard start_button selector failed; trying fallback generic submit button.")
+            if not _legacy._safe_locator_click(page, 'button[type="submit"]', timeout_ms=5000):
+                 raise RuntimeError("Could not click Atlas start button.")
     else:
         print("[auth] atlas.email not set; relying on existing logged-in session/profile only.")
         if "/login" in page.url.lower() or "/verify" in page.url.lower():

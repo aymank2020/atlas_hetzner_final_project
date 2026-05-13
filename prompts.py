@@ -39,6 +39,7 @@ Strict rules:
 - no "-ing" verb starts; use imperative commands (e.g., "turn mold", not "turning mold")
 - no numerals in labels
 - never mix dense/coarse in one segment
+- Always use Dense labels over Coarse labels (greater granularity and accuracy)
 - max 2 atomic actions per segment label (usually one comma or one "and")
 - No Action only when hands touch nothing or ego is idle/irrelevant
 - No Action must be standalone, never mixed with action
@@ -66,9 +67,10 @@ Strict rules:
 - do not keep placeholder/default labels
 - do not hallucinate hidden actions
 - for retrieval from containers, prefer "remove [item] from [container]" over "take [item] out"
-- segment duration strictness: MAXIMUM 60 seconds per segment (No exceptions)
-- preferred density: 2-5 seconds per segment (the "Sweet Spot")
-- for continuous actions lasting > 60s: split every 60s and repeat the same label
+- segment duration strictness: MAXIMUM 20 seconds per segment (No exceptions)
+- preferred density: 2-10 seconds per segment (the "Sweet Spot")
+- for continuous actions lasting > 20s: split every 20s and repeat the same label
+- if a segment has more than 2 atomic actions: split it
 - handling empty draft rows: if draft row is blank/no-label and hands are disengaged, use "No Action" (do not invent an action)
 
 Output requirements:

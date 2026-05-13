@@ -182,6 +182,17 @@ To trace a broken segment end-to-end:
 - Task-scoped cache cleanup between episodes
 - Compatibility aliases in `legacy_impl.py`
 
+## Windows Compatibility
+
+The codebase is cross-platform and runs on Windows natively:
+
+- **Signal handlers**: `SIGTERM` is unavailable on Windows; handlers fall back to `SIGINT` only.
+- **Process termination**: Uses `taskkill /T /F` on Windows instead of Unix `killpg`/`pkill`.
+- **Chrome paths**: Auto-detects Windows Chrome installs (`ProgramFiles`, `LocalAppData`).
+- **ffmpeg/ffprobe**: Searches Windows-specific paths (`WinGet`, `scoop`, `C:\ffmpeg\bin`).
+- **Subprocess flags**: Uses `CREATE_NEW_PROCESS_GROUP` + `DETACHED_PROCESS` on Windows.
+- **Deployment scripts** (`deploy/*.sh`, `systemd` services) are Linux-only and not required for Windows runs.
+
 ## What Not To Assume
 
 - Gemini timestamps are NOT reliable

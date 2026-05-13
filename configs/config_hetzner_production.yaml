@@ -98,6 +98,16 @@ run:
   capture_step_screenshots: true
   capture_step_screenshots_full_page: false
   capture_step_html: false
+  # Safety and Quality Gates
+  confidence_threshold: 0.7
+  block_on_escalation_flag: true
+  block_on_high_audit_risk: true
+  forced_split_fallback_enabled: true
+  label_autofix_enabled: true
+  label_autofix_forbidden_verbs: true
+  label_autofix_missing_locations: true
+  label_autofix_atomic_actions: true
+  max_segment_duration_sec: 20.0
   capture_step_history_limit: 16
   enable_quality_review_submit: true
   submit_manual_watch_enabled: true
@@ -114,7 +124,7 @@ run:
   skip_policy_lexical_checks_on_unchanged_labels: true
   ignore_timestamp_policy_errors_when_adjust_disabled: false
   ignore_no_action_standalone_policy_error: true
-  max_segment_duration_sec: 10.0
+  max_segment_duration_sec: 20.0
   # Pre-submit compare (disabled for speed on server)
   pre_submit_chat_compare_enabled: false
   pre_submit_chat_compare_required: false

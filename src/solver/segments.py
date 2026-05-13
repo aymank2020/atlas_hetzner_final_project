@@ -544,7 +544,7 @@ def extract_segments(
     if items:
         durations = [round(seg["end_sec"] - seg["start_sec"], 1) for seg in items]
         max_dur = max(durations) if durations else 0.0
-        overlong = [i + 1 for i, d in enumerate(durations) if d > 10.0]
+        overlong = [i + 1 for i, d in enumerate(durations) if d > 20.0]
         checksum = build_segment_checksum(items)
         print(
             f"[trace] extract_segments: count={len(items)} "
@@ -559,7 +559,7 @@ def extract_segments(
 def _pre_submit_duration_check(
     page: Page,
     cfg: Dict[str, Any],
-    max_dur: float = 10.0,
+    max_dur: float = 20.0,
 ) -> Dict[str, Any]:
     """Final safety check: re-read DOM and verify ALL segments <= max_dur.
 
@@ -657,17 +657,17 @@ def _filter_structural_operations(
     if not source_segments:
         return list(operations)
 
-    max_segment_duration_sec = max(0.0, float(_cfg_get(cfg or {}, "run.max_segment_duration_sec", 10.0) or 0.0))
+    max_segment_duration_sec = max(0.0, float(_cfg_get(cfg or {}, "run.max_segment_duration_sec", 20.0) or 0.0))
     split_min_duration_sec = float(
         _cfg_get(
             cfg or {},
             "run.structural_split_min_duration_sec",
-            max_segment_duration_sec or 10.0,
+            max_segment_duration_sec or 20.0,
         )
         or 0.0
     )
     if split_min_duration_sec <= 0.0:
-        split_min_duration_sec = max_segment_duration_sec or 10.0
+        split_min_duration_sec = max_segment_duration_sec or 20.0
 
     segment_by_index: Dict[int, Dict[str, Any]] = {
         int(seg.get("segment_index", 0) or 0): seg for seg in source_segments
@@ -1133,7 +1133,7 @@ def _should_force_structural_repairs_on_large_episode(
 ) -> bool:
     if not operations or not source_segments:
         return False
-    max_duration = max(0.1, float(_cfg_get(cfg, "run.max_segment_duration_sec", 10.0) or 10.0))
+    max_duration = max(0.1, float(_cfg_get(cfg, "run.max_segment_duration_sec", 20.0) or 20.0))
     aggressive_actions = {
         str(op.get("action", "")).strip().lower()
         for op in (operations or [])
@@ -2740,7 +2740,7 @@ def apply_labels(
         float(_cfg_get(cfg, "run.label_apply_dynamic_budget_per_target_sec", 12.0) or 12.0),
     )
     no_progress_timeout_sec = max(
-        10.0,
+        20.0,
         float(_cfg_get(cfg, "run.label_apply_no_progress_timeout_sec", 90.0) or 90.0),
     )
     max_consecutive_row_failures = max(
@@ -3020,7 +3020,7 @@ def apply_labels(
 
         max_segment_duration_sec = max(
             0.1,
-            float(_cfg_get(cfg, "run.max_segment_duration_sec", 10.0) or 10.0),
+            float(_cfg_get(cfg, "run.max_segment_duration_sec", 20.0) or 20.0),
         )
         duration_guard = _pre_submit_duration_check(
             page,

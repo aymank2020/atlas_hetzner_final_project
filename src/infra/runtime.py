@@ -21,8 +21,11 @@ def _install_signal_handlers() -> None:
     """Register SIGTERM/SIGINT handlers for clean VPS shutdown."""
     try:
         signal.signal(signal.SIGINT, _request_shutdown)
-        signal.signal(signal.SIGTERM, _request_shutdown)
-        print("[init] graceful shutdown handlers installed (SIGINT/SIGTERM).")
+        if hasattr(signal, "SIGTERM"):
+            signal.signal(signal.SIGTERM, _request_shutdown)
+            print("[init] graceful shutdown handlers installed (SIGINT/SIGTERM).")
+        else:
+            print("[init] graceful shutdown handler installed (SIGINT only; SIGTERM unavailable on Windows).")
     except (OSError, ValueError):
         # signal handlers can only be set in the main thread
         pass

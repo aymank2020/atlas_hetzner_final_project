@@ -617,7 +617,7 @@ def _maybe_repair_overlong_segments(
             ]
             max_segment_duration_sec = max(
                 0.1,
-                float(_cfg_get(cfg, "run.max_segment_duration_sec", 10.0) or 10.0),
+                float(_cfg_get(cfg, "run.max_segment_duration_sec", 20.0) or 20.0),
             )
             neighbor_count = max(
                 0, int(_cfg_get(cfg, "run.targeted_repair_scope_neighbors", 2) or 2)
@@ -704,29 +704,40 @@ def _maybe_repair_overlong_segments(
                     print(
                         "[policy] chat-repair planner returned no usable split operations."
                     )
-                    _capture_step(f"targeted_repair_noop_{round_no}", include_html=True)
-                    _record_repair_after(
-                        list(overlong_indices),
-                        stagnant=True,
-                    )
-                    _journal_repair_event(
-                        "repair_round_noop",
-                        reason="planner_returned_no_split_ops",
-                        repair_round=round_no,
-                        payload={"target_indices": list(target_indices)},
-                        segments_snapshot=current_segments,
-                    )
-                    remaining = list(overlong_indices)
-                    stagnant_rounds += 1
-                    result["repair_rounds"] = round_no
-                    result["retry_stage"] = retry_stage
-                    result["retry_reason"] = "policy_overlong"
-                    if stagnant_rounds >= 2:
-                        print(
-                            "[policy] overlong repair stopped after repeated no-op rounds."
+                    
+                    if bool(_cfg_get(cfg, "run.forced_split_fallback_enabled", True)):
+                        print("[policy] falling back to forced duration-based split for overlong segments.")
+                        split_ops = [
+                            {
+                                "action": "split",
+                                "segment_index": int(idx),
+                            }
+                            for idx in overlong_indices[:max_splits_per_round]
+                        ]
+                    else:
+                        _capture_step(f"targeted_repair_noop_{round_no}", include_html=True)
+                        _record_repair_after(
+                            list(overlong_indices),
+                            stagnant=True,
                         )
-                        break
-                    continue
+                        _journal_repair_event(
+                            "repair_round_noop",
+                            reason="planner_returned_no_split_ops",
+                            repair_round=round_no,
+                            payload={"target_indices": list(target_indices)},
+                            segments_snapshot=current_segments,
+                        )
+                        remaining = list(overlong_indices)
+                        stagnant_rounds += 1
+                        result["repair_rounds"] = round_no
+                        result["retry_stage"] = retry_stage
+                        result["retry_reason"] = "policy_overlong"
+                        if stagnant_rounds >= 2:
+                            print(
+                                "[policy] overlong repair stopped after repeated no-op rounds."
+                            )
+                            break
+                        continue
 
                 op_result = legacy.apply_segment_operations(
                     page,

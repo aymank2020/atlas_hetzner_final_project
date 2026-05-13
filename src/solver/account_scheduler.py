@@ -230,6 +230,34 @@ def _terminate_process_group(
 ) -> None:
     if proc.poll() is not None:
         return
+
+    if os.name == "nt":
+        # Windows: use taskkill to terminate the tree
+        try:
+            proc.send_signal(signal.CTRL_BREAK_EVENT if hasattr(signal, "CTRL_BREAK_EVENT") else signal.SIGTERM)
+        except Exception:
+            pass
+        try:
+            proc.wait(timeout=max(1.0, grace_sec))
+            return
+        except Exception:
+            pass
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(proc.pid), "/T", "/F"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+        except Exception:
+            pass
+        try:
+            proc.kill()
+        except Exception:
+            pass
+        return
+
+    # Unix/Linux path
     try:
         pgid = os.getpgid(proc.pid)
     except Exception:
@@ -251,18 +279,20 @@ def _terminate_process_group(
     except Exception:
         pass
 
-    _send(signal.SIGTERM)
-    try:
-        proc.wait(timeout=5.0)
-        return
-    except Exception:
-        pass
+    if hasattr(signal, "SIGTERM"):
+        _send(signal.SIGTERM)
+        try:
+            proc.wait(timeout=5.0)
+            return
+        except Exception:
+            pass
 
-    _send(signal.SIGKILL)
-    try:
-        proc.wait(timeout=5.0)
-    except Exception:
-        pass
+    if hasattr(signal, "SIGKILL"):
+        _send(signal.SIGKILL)
+        try:
+            proc.wait(timeout=5.0)
+        except Exception:
+            pass
 
 
 def run_account_process(

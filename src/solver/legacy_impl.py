@@ -3616,6 +3616,10 @@ def _validate_segment_plan_against_policy(
         r"\bmove\s+\w+\s+back\s+and\s+forth\b",
         re.IGNORECASE,
     )
+    
+    confidence_threshold = float(_cfg_get(cfg, "run.confidence_threshold", 0.7) or 0.7)
+    block_on_escalation = bool(_cfg_get(cfg, "run.block_on_escalation_flag", True))
+    block_on_high_audit_risk = bool(_cfg_get(cfg, "run.block_on_high_audit_risk", True))
 
     source_by_idx: Dict[int, Dict[str, Any]] = {}
     for seg in source_segments:
@@ -3699,6 +3703,18 @@ def _validate_segment_plan_against_policy(
                     errors.append(
                         f"segment {idx}: label has more than {max_atomic_actions} atomic actions"
                     )
+
+            # Confidence and Escalation Checks (No-Confidence Exception)
+            confidence = _safe_float(item.get("confidence"), 1.0)
+            if confidence < confidence_threshold:
+                errors.append(f"segment {idx}: low confidence ({confidence:.2f} < {confidence_threshold})")
+            
+            if block_on_escalation and item.get("escalation_flag"):
+                errors.append(f"segment {idx}: escalation_flag is set by model")
+                
+            audit_risk = item.get("audit_risk", {})
+            if block_on_high_audit_risk and isinstance(audit_risk, dict) and audit_risk.get("level") == "high":
+                errors.append(f"segment {idx}: high audit risk detected")
             else:
                 if "," in label or " and " in label_l:
                     errors.append(f"segment {idx}: 'No Action' must be standalone")
@@ -5561,7 +5577,10 @@ def _connect_atlas_browser_context(
             if browser.contexts:
                 context = browser.contexts[0]
             else:
-                context = browser.new_context()
+                context = browser.new_context(
+                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                    viewport={"width": 1920, "height": 1080}
+                )
             print("[browser] CDP connection established.")
             if context.pages:
                 pages_snapshot = list(context.pages)
@@ -5580,6 +5599,17 @@ def _connect_atlas_browser_context(
                             page = candidate
                             break
                 if page is not None:
+                    try:
+                        # Force Desktop User Agent
+                        page.set_extra_http_headers({
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+                        })
+                        context.set_viewport_size({"width": 1920, "height": 1080})
+                        # Force reload to clear mobile overlays with new UA
+                        page.reload(wait_until="domcontentloaded")
+                        page.wait_for_timeout(1000)
+                    except Exception:
+                        pass
                     for candidate in list(context.pages):
                         if candidate is page:
                             continue
@@ -5592,6 +5622,10 @@ def _connect_atlas_browser_context(
                     print(f"[browser] reused and cleaned up window. Primary tab: {page.url}")
                 else:
                     page = context.new_page()
+                    try:
+                        page.set_viewport_size({"width": 1920, "height": 1080})
+                    except Exception:
+                        pass
                     for candidate in list(pages_snapshot):
                         if candidate is page:
                             continue
@@ -5604,6 +5638,10 @@ def _connect_atlas_browser_context(
                     print("[browser] only internal tabs were present; opened fresh tab in window.")
             else:
                 page = context.new_page()
+                try:
+                    page.set_viewport_size({"width": 1920, "height": 1080})
+                except Exception:
+                    pass
                 print("[browser] opened fresh tab in window.")
             print(f"[browser] attached to page: {page.url}")
             return browser, context, page, "cdp"
@@ -6810,7 +6848,7 @@ def run(cfg: Dict[str, Any], execute: bool) -> None:
                         segments,
                         max(
                             0.1,
-                            float(_cfg_get(cfg, "run.max_segment_duration_sec", 10.0) or 10.0),
+                            float(_cfg_get(cfg, "run.max_segment_duration_sec", 20.0) or 20.0),
                         ),
                     )
 
@@ -7404,6 +7442,13 @@ def run(cfg: Dict[str, Any], execute: bool) -> None:
                                     seen_task_ids.add(task_id)
                                 _invalidate_cached_labels(cfg, task_id)
                             episode_report.failure_class = FailureClass.POLICY_FAILURE
+                            if any("low confidence" in str(e).lower() for e in errors):
+                                episode_report.failure_class = FailureClass.HALLUCINATION_FAILURE
+                                episode_report.retry_reason = RetryReason.LOW_CONFIDENCE
+                            if any("escalation_flag" in str(e).lower() for e in errors):
+                                episode_report.failure_class = FailureClass.HALLUCINATION_FAILURE
+                                episode_report.retry_reason = "model_escalation"
+                                
                             episode_report.desync_detected = any(
                                 "desync" in str(item).lower()
                                 for item in errors + warnings
