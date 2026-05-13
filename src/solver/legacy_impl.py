@@ -5578,8 +5578,8 @@ def _connect_atlas_browser_context(
                 context = browser.contexts[0]
             else:
                 context = browser.new_context(
-                    user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                    viewport={"width": 1920, "height": 1080}
+                    user_agent=_browser_auth._DESKTOP_USER_AGENT,
+                    viewport=_browser_auth._DESKTOP_VIEWPORT,
                 )
             print("[browser] CDP connection established.")
             if context.pages:
@@ -5600,11 +5600,8 @@ def _connect_atlas_browser_context(
                             break
                 if page is not None:
                     try:
-                        # Force Desktop User Agent
-                        page.set_extra_http_headers({
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-                        })
-                        context.set_viewport_size({"width": 1920, "height": 1080})
+                        # Force desktop environment (UA + viewport + overlay bypass)
+                        _browser_auth.force_desktop_environment(context, page)
                         # Force reload to clear mobile overlays with new UA
                         page.reload(wait_until="domcontentloaded")
                         page.wait_for_timeout(1000)
@@ -5623,6 +5620,7 @@ def _connect_atlas_browser_context(
                 else:
                     page = context.new_page()
                     try:
+                        _browser_auth.apply_desktop_overlay_bypass(context, page)
                         page.set_viewport_size({"width": 1920, "height": 1080})
                     except Exception:
                         pass
@@ -5639,6 +5637,7 @@ def _connect_atlas_browser_context(
             else:
                 page = context.new_page()
                 try:
+                    _browser_auth.apply_desktop_overlay_bypass(context, page)
                     page.set_viewport_size({"width": 1920, "height": 1080})
                 except Exception:
                     pass

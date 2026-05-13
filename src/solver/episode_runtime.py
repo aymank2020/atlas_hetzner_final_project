@@ -8,6 +8,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+from src.infra.browser_auth import (
+    apply_desktop_overlay_bypass,
+    force_desktop_environment,
+)
 
 LoggerFn = Callable[[str, Dict[str, Any]], None]
 
@@ -185,6 +189,11 @@ class EpisodeRuntime:
                 atlas_kwargs["storage_state"] = str(Path(self.atlas_storage_state_path))
             self.atlas_context = atlas_browser.new_context(**atlas_kwargs)
             self.atlas_page = self.atlas_context.new_page()
+            # Apply Desktop-Only overlay bypass + desktop environment to isolated context
+            try:
+                force_desktop_environment(self.atlas_context, self.atlas_page)
+            except Exception:
+                pass
             if str(self.atlas_page_url or "").strip():
                 self.atlas_page.goto(str(self.atlas_page_url), wait_until="domcontentloaded", timeout=60000)
             event = {
@@ -208,6 +217,11 @@ class EpisodeRuntime:
             if page is None:
                 self.gemini_page = gemini_existing_context.new_page()
                 self.gemini_page_borrowed = False
+                # Apply overlay bypass to new page in existing context
+                try:
+                    apply_desktop_overlay_bypass(gemini_existing_context, self.gemini_page)
+                except Exception:
+                    pass
             else:
                 self.gemini_page = page
             if str(self.gemini_page_url or "").strip():
@@ -229,6 +243,11 @@ class EpisodeRuntime:
                 gemini_kwargs["storage_state"] = str(Path(self.gemini_storage_state_path))
             self.gemini_context = gemini_browser.new_context(**gemini_kwargs)
             self.gemini_page = self.gemini_context.new_page()
+            # Apply overlay bypass to isolated Gemini context
+            try:
+                apply_desktop_overlay_bypass(self.gemini_context, self.gemini_page)
+            except Exception:
+                pass
             if str(self.gemini_page_url or "").strip():
                 self.gemini_page.goto(str(self.gemini_page_url), wait_until="domcontentloaded", timeout=60000)
             event = {
@@ -271,6 +290,11 @@ class EpisodeRuntime:
                 if page is None:
                     page = borrowed_context.new_page()
                     self.gemini_page_borrowed = False
+                    # Apply overlay bypass to new page in borrowed context
+                    try:
+                        apply_desktop_overlay_bypass(borrowed_context, page)
+                    except Exception:
+                        pass
                 self.gemini_page = page
                 if str(self.gemini_page_url or "").strip():
                     current_url = str(getattr(page, "url", "") or "").strip()
@@ -339,6 +363,11 @@ class EpisodeRuntime:
         try:
             self.gemini_context = self.gemini_browser.new_context(**gemini_kwargs)
             self.gemini_page = self.gemini_context.new_page()
+            # Apply overlay bypass to fresh Gemini context
+            try:
+                apply_desktop_overlay_bypass(self.gemini_context, self.gemini_page)
+            except Exception:
+                pass
         except Exception:
             if self.gemini_cdp_url:
                 self.gemini_browser, self.gemini_context, self.gemini_page = (
@@ -382,6 +411,17 @@ class EpisodeRuntime:
         if page is None:
             page = context.new_page()
             self.gemini_page_borrowed = False
+            # Apply overlay bypass to new page from CDP reconnect
+            try:
+                apply_desktop_overlay_bypass(context, page)
+            except Exception:
+                pass
+        else:
+            # Apply overlay bypass to reused page from CDP reconnect
+            try:
+                apply_desktop_overlay_bypass(context, page)
+            except Exception:
+                pass
         return browser, context, page
 
     def close(self, *, logger: Optional[LoggerFn] = None) -> None:

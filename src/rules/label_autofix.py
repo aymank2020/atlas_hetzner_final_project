@@ -8,7 +8,7 @@ from src.rules.labels import (
     _allowed_label_start_verb_token_patterns_from_cfg,
     _contains_forbidden_verb_in_label,
     _label_starts_with_allowed_action_verb,
-    _normalize_label_for_compare,
+    _normalize_label_min_safety,
 )
 
 # Common mappings for forbidden/bad verbs to allowed ones
@@ -122,7 +122,7 @@ def apply_autofix_to_plan(
         original_label = str(item.get("label", "")).strip()
         fixed_label = autofix_segment_label(original_label, cfg, allowed_patterns, forbidden_verbs)
         
-        if _normalize_label_for_compare(original_label) != _normalize_label_for_compare(fixed_label):
+        if _normalize_label_min_safety(original_label) != _normalize_label_min_safety(fixed_label):
             item["label"] = fixed_label
             fixes_applied += 1
             

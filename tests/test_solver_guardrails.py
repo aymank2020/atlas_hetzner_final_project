@@ -52,13 +52,13 @@ class TestSolverGuardrails(unittest.TestCase):
         validator.refresh_policy_constraints()
         annotation = {
             "episode_id": "guardrail_demo",
-            "video_duration_sec": 15.0,
+            "video_duration_sec": 30.0,
             "segments": [
                 {
                     "segment_index": 1,
                     "start_sec": 0.0,
-                    "end_sec": 12.4,
-                    "duration_sec": 12.4,
+                    "end_sec": 25.0,
+                    "duration_sec": 25.0,
                     "label": "adjust over guide fabric",
                 }
             ],

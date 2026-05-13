@@ -594,6 +594,110 @@ def _resolve_otp_code(cfg: Dict[str, Any], started_at_unix: float, min_uid: Opti
     raise ValueError(f"Unsupported otp.provider: {provider}")
 
 
+# ---------------------------------------------------------------------------
+# Desktop overlay bypass — shared JS surgery
+# ---------------------------------------------------------------------------
+
+_DESKTOP_USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/122.0.0.0 Safari/537.36"
+)
+_DESKTOP_VIEWPORT = {"width": 1920, "height": 1080}
+
+
+def get_desktop_overlay_bypass_js() -> str:
+    """Return the JS payload that removes the Atlas 'Desktop Only' blocking overlay.
+
+    Uses **computed-style** matching so it survives Tailwind class renames.
+    The script:
+      1. Injects a CSS rule that hides high-z-index full-screen overlays.
+      2. Scans the DOM for elements whose text contains 'Desktop Only' or
+         'Mobile devices are not supported' and hides them + their fixed parent.
+      3. Installs a MutationObserver so any dynamically-added overlays are
+         removed immediately.
+    """
+    return """() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            div[class*="z-[9999]"],
+            div[class*="bg-slate-950"],
+            .fixed.inset-0.z-\\\\[9999\\\\] {
+                display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+        `;
+        document.documentElement.appendChild(style);
+
+        const removeOverlays = () => {
+            /* --- text-based scan (resilient to CSS class changes) --- */
+            const overlays = Array.from(document.querySelectorAll('div')).filter(el =>
+                el.textContent.includes('Desktop Only') ||
+                el.textContent.includes('Mobile devices are not supported')
+            );
+            overlays.forEach(el => {
+                el.style.display = 'none';
+                const parent = el.closest('.fixed.inset-0');
+                if (parent) parent.style.display = 'none';
+            });
+
+            /* --- computed-style scan (catches overlays without matching text) --- */
+            document.querySelectorAll('div.fixed, div[class*="fixed"]').forEach(el => {
+                const cs = window.getComputedStyle(el);
+                if (
+                    cs.position === 'fixed' &&
+                    cs.inset === '0px' &&
+                    parseInt(cs.zIndex) >= 9999 &&
+                    (el.textContent.match(/Desktop Only|Mobile devices are not supported/i) ||
+                     cs.backgroundColor === 'rgba(2, 6, 23, 0.95)')  /* slate-950 bg */
+                ) {
+                    el.style.display = 'none';
+                }
+            });
+        };
+        removeOverlays();
+        const observer = new MutationObserver(removeOverlays);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    }"""
+
+
+def apply_desktop_overlay_bypass(context: Any, page: Page) -> None:
+    """Apply the Desktop-Only overlay bypass surgery to a context + page.
+
+    - Registers the JS as an init-script on *context* (runs on every navigation).
+    - Evaluates it immediately on *page* (for the current page load).
+
+    Safe to call multiple times; duplicate init-scripts are idempotent.
+    """
+    surgery_js = get_desktop_overlay_bypass_js()
+    try:
+        context.add_init_script(surgery_js)
+    except Exception:
+        pass
+    try:
+        page.evaluate(surgery_js)
+    except Exception:
+        pass
+
+
+def force_desktop_environment(context: Any, page: Page) -> None:
+    """Force desktop User-Agent and viewport on a browser context + page.
+
+    Sets the extra HTTP headers so every request carries a desktop UA,
+    adjusts the viewport to 1920×1080, and injects the overlay bypass.
+    """
+    try:
+        page.set_extra_http_headers({"User-Agent": _DESKTOP_USER_AGENT})
+    except Exception:
+        pass
+    try:
+        context.set_viewport_size(_DESKTOP_VIEWPORT)
+    except Exception:
+        pass
+    apply_desktop_overlay_bypass(context, page)
+
+
 def _body_has_rate_limit(page: Page) -> bool:
     try:
         text = (page.inner_text("body") or "").lower()
@@ -640,42 +744,8 @@ def ensure_logged_in(page: Page, cfg: Dict[str, Any]) -> None:
         print("[auth] already logged in (pre-check).")
         return
 
-    # Surgery: Make overlay removal persistent for every page load in this context
-    try:
-        surgery_js = """() => {
-            const style = document.createElement('style');
-            style.textContent = `
-                div[class*="z-[9999]"], 
-                div[class*="bg-slate-950"],
-                .fixed.inset-0.z-\\\\[9999\\\\] { 
-                    display: none !important; 
-                    visibility: hidden !important; 
-                    pointer-events: none !important; 
-                }
-            `;
-            document.documentElement.appendChild(style);
-
-            const removeOverlays = () => {
-                const overlays = Array.from(document.querySelectorAll('div')).filter(el => 
-                    el.textContent.includes('Desktop Only') || el.textContent.includes('Mobile devices are not supported')
-                );
-                overlays.forEach(el => {
-                    el.style.display = 'none';
-                    const parent = el.closest('.fixed.inset-0');
-                    if (parent) parent.style.display = 'none';
-                });
-            };
-            removeOverlays();
-            const observer = new MutationObserver(removeOverlays);
-            observer.observe(document.documentElement, { childList: true, subtree: true });
-        }"""
-        page.context.add_init_script(surgery_js)
-        try:
-            page.evaluate(surgery_js)
-        except:
-            pass
-    except Exception:
-        pass
+    # Apply Desktop-Only overlay bypass (shared utility)
+    apply_desktop_overlay_bypass(page.context, page)
 
     print(f"[auth] open login page: {login_url}")
     try:
@@ -781,4 +851,9 @@ __all__ = [
     "_body_has_rate_limit",
     "_wait_until_authenticated",
     "ensure_logged_in",
+    "get_desktop_overlay_bypass_js",
+    "apply_desktop_overlay_bypass",
+    "force_desktop_environment",
+    "_DESKTOP_USER_AGENT",
+    "_DESKTOP_VIEWPORT",
 ]
