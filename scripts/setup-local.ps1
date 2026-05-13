@@ -9,7 +9,7 @@ Write-Host "=== Atlas Solver Windows Setup ===" -ForegroundColor Cyan
 Write-Host "Project root: $ProjectRoot" -ForegroundColor Cyan
 
 # -------------------------------------------------------------------
-# 1. Check Python
+# 1. Check Python (use full executable path to avoid prefix confusion)
 # -------------------------------------------------------------------
 Write-Host "`n[1/6] Checking Python..." -ForegroundColor Yellow
 $pyExe = $null
@@ -17,10 +17,16 @@ foreach ($candidate in @("python", "python3", "py")) {
     try {
         $testResult = & $candidate --version 2>&1 | Out-String
         if ($testResult -match 'Python\s+(\d+)\.(\d+)') {
-            $pyExe = $candidate
             $major = [int]$Matches[1]
             $minor = [int]$Matches[2]
-            Write-Host "  Found: $($testResult.Trim()) (using '$candidate')" -ForegroundColor Green
+            # Get the full executable path to avoid prefix confusion
+            $pyPath = (Get-Command $candidate -ErrorAction SilentlyContinue).Source
+            if ($pyPath) {
+                $pyExe = $pyPath
+            } else {
+                $pyExe = $candidate
+            }
+            Write-Host "  Found: $($testResult.Trim()) at $pyExe" -ForegroundColor Green
             break
         }
     } catch {}
@@ -34,15 +40,35 @@ if ($major -lt 3 -or ($major -eq 3 -and $minor -lt 10)) {
 }
 
 # -------------------------------------------------------------------
+# 1b. Clean up broken venv / stale Lib from old clones
+# -------------------------------------------------------------------
+if (Test-Path ".venv") {
+    Write-Host "  Removing old .venv..." -ForegroundColor DarkGray
+    Remove-Item -Recurse -Force ".venv" -ErrorAction SilentlyContinue
+}
+if (Test-Path "Lib") {
+    $libCheck = Get-ChildItem "Lib" -Filter "*.py" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($libCheck) {
+        Write-Host "  WARNING: Found stale 'Lib' directory (confuses Python). Removing..." -ForegroundColor Yellow
+        Remove-Item -Recurse -Force "Lib" -ErrorAction SilentlyContinue
+    }
+}
+
+# -------------------------------------------------------------------
 # 2. Create virtual environment
 # -------------------------------------------------------------------
 Write-Host "`n[2/6] Setting up virtual environment..." -ForegroundColor Yellow
-if (-not (Test-Path ".venv")) {
-    & $pyExe -m venv .venv
-    Write-Host "  Created .venv" -ForegroundColor Green
-} else {
-    Write-Host "  .venv already exists" -ForegroundColor DarkGray
+& $pyExe -m venv .venv
+if (-not (Test-Path ".venv\Scripts\Activate.ps1")) {
+    Write-Host "  ERROR: venv creation failed. Trying with --clear..." -ForegroundColor Yellow
+    & $pyExe -m venv --clear .venv
 }
+if (-not (Test-Path ".venv\Scripts\Activate.ps1")) {
+    Write-Host "  ERROR: Could not create virtual environment." -ForegroundColor Red
+    Write-Host "  Try manually: & '$pyExe' -m venv .venv" -ForegroundColor Yellow
+    exit 1
+}
+Write-Host "  Created .venv" -ForegroundColor Green
 # Activate venv
 & ".\.venv\Scripts\Activate.ps1"
 Write-Host "  Virtual environment activated" -ForegroundColor Green
