@@ -1,25 +1,26 @@
 # ========================================================================
-# Atlas Solver - Hetzner CX43 Production Config
+# Atlas Solver - Local Development Config (Linux/macOS/Windows)
 # ========================================================================
-# Headless Chrome via Xvfb, single-tab mode.
-# Account: danatimer
-# Mode: REAL execution
+# Purpose: single-episode dry-run for local testing/debugging.
+# Usage:   python -u atlas_web_auto_solver.py --config configs/config_local_dev.yaml
+#          or: ./scripts/run-local.sh
 # ========================================================================
 
 browser:
-  headless: true
-  slow_mo_ms: 0
-  storage_state_path: ".state/atlas_auth_danatimer.json"
+  headless: false
+  slow_mo_ms: 25
+  storage_state_path: ".state/atlas_auth.json"
   force_login: false
-  use_chrome_profile: false
   restore_state_in_profile_mode: false
+  use_chrome_profile: true
   fallback_to_isolated_context_on_profile_error: false
   profile_launch_timeout_ms: 30000
   close_chrome_before_profile_launch: false
   profile_launch_retry_count: 1
   profile_launch_retry_delay_sec: 2.0
   clone_chrome_profile_to_temp: false
-  reuse_existing_cloned_profile: false
+  cloned_user_data_dir: ".state/chrome_user_data_clone"
+  reuse_existing_cloned_profile: true
   prefer_profile_with_atlas_cookies: false
   chrome_channel: "chrome"
   chrome_user_data_dir: ".state/gemini_chat_user_data"
@@ -31,27 +32,28 @@ browser:
   clear_env_proxy_for_backend_requests: true
 
 run:
-  dry_run: false
+  # DRY RUN: labels are generated but never applied/submitted.
+  dry_run: true
   max_segments: 0
-  max_episodes_per_run: 5
-  no_task_retry_count: 4
-  no_task_retry_delay_sec: 20.0
-  no_task_backoff_factor: 1.6
-  no_task_max_delay_sec: 180.0
+  max_episodes_per_run: 1
+  no_task_retry_count: 1
+  no_task_retry_delay_sec: 3.0
+  no_task_backoff_factor: 1.5
+  no_task_max_delay_sec: 10.0
   keep_alive_when_idle: false
-  keep_alive_idle_cycle_pause_sec: 60.0
+  keep_alive_idle_cycle_pause_sec: 120.0
   reserve_cooldown_sec: 120
   reserve_min_interval_sec: 90
   reserve_wait_only_on_rate_limit: true
   skip_reserve_when_all_visible_blocked: true
   clear_blocked_tasks_after_all_visible_blocked_hits: 2
-  reserve_attempts_per_visit: 1
+  reserve_attempts_per_visit: 3
   reserve_label_wait_timeout_ms: 12000
   reserve_refresh_after_click: true
   reserve_rate_limit_wait_sec: 180
-  release_all_on_internal_error: true
+  release_all_on_internal_error: false
   recycle_after_max_episodes: false
-  release_all_after_batch: true
+  release_all_after_batch: false
   release_all_wait_sec: 180
   release_and_reserve_on_submit_unverified: false
   goto_retry_count: 3
@@ -59,30 +61,29 @@ run:
   skip_duplicate_task_in_run: true
   duplicate_task_retry_count: 3
   duplicate_task_retry_wait_sec: 2.0
-  continue_on_episode_error: true
-  max_episode_failures_per_run: 20
+  continue_on_episode_error: false
+  max_episode_failures_per_run: 5
   episode_failure_retry_delay_sec: 4.0
   max_video_prepare_failures_per_task: 2
   workflow_reentry_enter_clicks: 2
   workflow_reentry_second_click_delay_sec: 5.0
   min_delay_between_episodes_sec: 1.5
   max_delay_between_episodes_sec: 4.0
-  reuse_cached_labels: false
+  reuse_cached_labels: true
   skip_unchanged_labels: true
   resume_from_artifacts: false
   resume_skip_video_steps_when_cached: false
   resume_skip_apply_steps_when_done: false
   allow_resume_auto_submit: false
-  execute_force_fresh_gemini: true
+  execute_force_fresh_gemini: false
   execute_force_live_segments: true
   execute_require_video_context: true
-  # v2 episode runtime with browser isolation
+  # v2 episode runtime
   use_episode_runtime_v2: true
   strict_single_chat_session: true
   force_episode_browser_isolation: true
   sticky_episode_resume: true
-  disable_release_all_during_canary: false
-  # Single tab mode for headless server
+  disable_release_all_during_canary: true
   single_window_two_tabs: false
   single_window_single_tab: true
   hold_rule_context_neighbors: 2
@@ -96,17 +97,15 @@ run:
   segment_chunking_disable_operations: false
   use_task_scoped_artifacts: true
   capture_step_screenshots: true
-  capture_step_screenshots_full_page: false
-  capture_step_html: false
-  capture_step_history_limit: 16
+  capture_step_screenshots_full_page: true
+  capture_step_html: true
+  # Submit controls (disabled for dry-run but kept for reference).
   enable_quality_review_submit: true
   submit_manual_watch_enabled: true
   submit_manual_watch_timeout_sec: 180.0
   submit_manual_watch_poll_ms: 500
   submit_manual_watch_log_interval_sec: 10.0
   quality_review_submit_settle_sec: 30.0
-  submit_deep_verify_dashboard: true
-  submit_deep_verify_dashboard_timeout_sec: 30.0
   loop_off_on_episode_open: true
   # Policy gate
   enable_policy_gate: true
@@ -115,9 +114,9 @@ run:
   ignore_timestamp_policy_errors_when_adjust_disabled: false
   ignore_no_action_standalone_policy_error: true
   max_segment_duration_sec: 10.0
-  # Pre-submit compare (disabled for speed on server)
-  pre_submit_chat_compare_enabled: false
-  pre_submit_chat_compare_required: false
+  # Pre-submit compare
+  pre_submit_chat_compare_enabled: true
+  pre_submit_chat_compare_required: true
   pre_submit_chat_compare_model: "gemini-3.1-pro-preview"
   pre_submit_chat_compare_block_on_chat_failure: true
   pre_submit_chat_compare_block_when_chat_better: true
@@ -126,8 +125,7 @@ run:
   pre_submit_chat_compare_seed_discord_context: true
   pre_submit_chat_compare_discord_context_max_messages: 120
   pre_submit_chat_compare_discord_context_max_chars_per_message: 900
-  # Pacing
-  major_step_pause_enabled: true
+  major_step_pause_enabled: false
   major_step_pause_min_sec: 8.0
   major_step_pause_max_sec: 18.0
   # Label quality
@@ -154,9 +152,7 @@ run:
   requery_after_structural_actions: true
   max_structural_operations: 12
   structural_allow_split: true
-  structural_allow_merge: false
-  auto_continuity_merge_enabled: false
-  structural_skip_if_segments_ge: 0
+  structural_skip_if_segments_ge: 40
   structural_max_failures_per_episode: 4
   structural_wait_rows_delta_timeout_ms: 1800
   # Timestamp adjustments
@@ -170,18 +166,18 @@ run:
   timestamp_abort_on_first_failure: false
   timestamp_skip_disabled_buttons: true
   # Label apply budgets
-  label_apply_progress_every: 4
-  label_apply_max_total_sec: 420
-  label_apply_max_failures: 8
-  label_apply_input_timeout_ms: 5000
-  label_apply_save_timeout_ms: 3000
-  label_apply_edit_click_timeout_ms: 2000
+  label_apply_progress_every: 5
+  label_apply_max_total_sec: 600
+  label_apply_max_failures: 18
+  label_apply_input_timeout_ms: 3000
+  label_apply_save_timeout_ms: 1200
+  label_apply_edit_click_timeout_ms: 650
   # Submit guard
   submit_guard_enabled: true
-  submit_guard_max_failure_ratio: 0.2
+  submit_guard_max_failure_ratio: 0.25
   submit_guard_min_applied_ratio: 0.90
-  submit_guard_block_on_budget_exceeded: false
-  # Video
+  submit_guard_block_on_budget_exceeded: true
+  # Video playback
   play_full_video_before_labeling: false
   play_full_video_max_wait_sec: 900
   segment_resolve_attempts: 12
@@ -194,15 +190,12 @@ run:
   modal_dismiss_passes: 2
   modal_dismiss_timeout_ms: 120
   modal_dismiss_post_click_wait_ms: 120
-  output_dir: "outputs/hetzner_production"
+  # Output paths
+  output_dir: "outputs/local_dev"
   segments_dump: "atlas_segments_dump.json"
   labels_dump: "atlas_labels_from_gemini.json"
   prompt_dump: "atlas_prompt.txt"
   video_dump: "atlas_task_video.mp4"
-  # Policy auto-repair
-  policy_auto_split_repair_enabled: true
-  policy_auto_split_repair_max_rounds: 5
-  policy_auto_split_repair_max_segments_per_round: 30
 
 atlas:
   login_url: "https://audit.atlascapture.io/login?redirect=%2F"
@@ -269,36 +262,27 @@ otp:
 
 economics:
   episode_expected_revenue_usd: 0.5
-  target_cost_ratio: 999.0
-  hard_cost_ratio: 999.0
+  target_cost_ratio: 0.15
+  hard_cost_ratio: 0.2
   enforce_cost_guards: false
 
 gemini:
-  auth_mode: chat_web
   chat_web_url: "https://gemini.google.com/app"
   chat_web_connect_over_cdp_url: "http://127.0.0.1:9222"
-  chat_web_cdp_connect_timeout_ms: 8000
   chat_web_reuse_cdp_context: true
-  chat_web_preserve_existing_thread: false
-  chat_web_preserve_existing_thread_across_episodes: false
-  chat_web_clean_thread_per_episode: true
+  chat_web_preserve_existing_thread: true
+  chat_web_preserve_existing_thread_across_episodes: true
+  chat_web_clean_thread_per_episode: false
   chat_web_clean_thread_per_request: false
   chat_web_require_authenticated_session: true
   chat_web_chunk_thread_reset_after_n_chunks: 8
   chat_web_channel: "chrome"
-  chat_web_storage_state: ".state/gemini_chat_storage_state_danatimer.json"
+  chat_web_storage_state: ".state/gemini_chat_storage_state.json"
   chat_web_user_data_dir: ".state/gemini_chat_user_data"
   chat_web_ignore_automation: true
   chat_web_headless: false
   chat_web_prefer_drive_picker: false
-  chat_web_force_clean_thread: false
-  chat_web_launch_args:
-    - '--no-sandbox'
-    - '--disable-dev-shm-usage'
-    - '--disable-gpu'
-    - '--disable-software-rasterizer'
-    - '--test-type'
-  chat_web_drive_root_folder_url: "https://drive.google.com/drive/u/0/folders/1pFpN8vcpaQltPmNKUY36Xi-2qIxhQ1bw"
+  chat_web_drive_root_folder_url: ""
   chat_web_clean_thread_fallback_enabled: false
   chat_web_memory_primer_file: ""
   chat_web_seed_context_send_before_prompt: false
@@ -316,6 +300,8 @@ gemini:
   chat_web_response_stall_sec_thinking: 180.0
   api_key: ""
   fallback_api_key: ""
+  quota_fallback_enabled: true
+  quota_fallback_max_uses_per_run: 4
   model: "gemini-3.1-pro-preview"
   system_instruction_file: "data/gemini_policy_v1.txt"
   system_instruction_text: ""
@@ -335,9 +321,9 @@ gemini:
   price_output_per_million: 2.50
   usage_log_file: "gemini_usage.jsonl"
   rate_limit_enabled: true
-  rate_limit_requests_per_minute: 4
+  rate_limit_requests_per_minute: 9
   rate_limit_window_sec: 60.0
-  rate_limit_min_interval_sec: 15.0
+  rate_limit_min_interval_sec: 6.8
   video_transport: "inline"
   files_api_fallback_to_inline: true
   file_ready_timeout_sec: 180
@@ -363,28 +349,6 @@ gemini:
     policy_retry: "gemini-3.1-pro-preview"
     compare_api: "gemini-3.1-pro-preview"
     compare_chat: "gemini-3.1-pro-preview"
-  gen3_fallback_models: []
-  policy_retry_model: "gemini-3.1-pro-preview"
-  chat_ops_model: "gemini-3.1-pro-preview"
-  chat_labels_model: "gemini-3.1-pro-preview"
-  chat_ops_response_schema_enabled: true
-  chat_labels_response_schema_enabled: true
-  retry_with_stronger_model_on_policy_fail: false
-  policy_retry_only_if_flash: false
-  quota_fallback_enabled: false
-  quota_fallback_max_uses_per_run: 6
-  retry_with_quota_fallback_model: false
-  quota_fallback_model: "gemini-3.1-pro-preview"
-  quota_fallback_from_models: []
-  zero_quota_model_cooldown_sec: 21600.0
-  api_keys: []
-  rotation_policy: round_robin
-  prefer_fallback_key_as_primary: false
-  retry_on_quota_429: true
-  quota_retry_default_wait_sec: 30.0
-  top_p: null
-  top_k: null
-  max_output_tokens: null
   reference_frames_enabled: true
   reference_frames_always: false
   reference_frame_attach_when_video_mb_le: 2.5
@@ -402,83 +366,7 @@ gemini:
   video_candidate_scan_wait_ms: 1500
   validate_video_decode: true
   min_video_bytes: 500000
-  extra_instructions: >-
-    If floor mat vs table is unclear, do not guess raised furniture; use neutral
-    location wording. Apply the newest dense-first segmenting update: shorter
-    segments are the standard, target 2-5 seconds when the visible actions support
-    it, never exceed 10 seconds, capture task-relevant pauses, and correct the
-    existing auto-labels instead of rewriting from zero unless the draft is clearly
-    wrong.
-
-training_feedback:
-  enabled: true
-  continuous: true
-  interval_sec: 1800
-  max_cycles: 0
-  max_episodes: 20
-  root_dir: outputs/training_feedback
-  runs_subdir: runs
-  live_subdir: live
-  migrate_legacy_dirs: true
-  max_consecutive_failures: 5
-  track_t4_disputes: true
-  t4_tracker_filename: t4_tracker_state.json
-  t4_transitions_filename: t4_transitions_history.jsonl
-  t4_lessons_filename: t4_lessons_history.jsonl
-  disputes_status_filters:
-    - Disputed
-    - Awaiting T2
-    - Both OK
-  enable_alignment_review: true
-  alignment_lessons_filename: alignment_lessons_history.jsonl
-  alignment_max_episodes_in_prompt: 20
-  alignment_max_chars_per_episode: 2500
-  use_chrome_profile: false
-
-discord_training:
-  enabled: true
-  continuous: true
-  interval_sec: 900
-  max_cycles: 0
-  root_dir: outputs/training_feedback/discord
-  runs_subdir: runs
-  live_subdir: live
-  input_dir: outputs/discord_exports
-  include_subdirs: true
-  file_patterns:
-    - '*.json'
-    - '*.txt'
-  max_files_per_cycle: 120
-  max_messages_in_prompt: 350
-  max_chars_per_message: 900
-  min_new_messages_for_gemini: 1
-  channel_allowlist_ids:
-    - '1485540323584118877'
-  channel_allowlist_names:
-    - atlas-rules
-  author_allowlist:
-    - Frans
-    - Duwop
-  update_keywords:
-    - update
-    - new rule
-    - guideline
-    - forbidden
-    - must
-    - do not
-    - limit
-    - gripper
-    - coarse
-    - dense
-    - atomic
-    - hallucination
-  export_command: ''
-  export_workdir: ''
-  export_timeout_sec: 180
-  state_filename: collector_state.json
-  max_seen_ids: 50000
-  policy_override_file: data/gemini_policy_discord_live.txt
-  sync_policy_into_main_file: true
-  main_policy_file: data/gemini_policy_v1.txt
-  managed_block_start: "# BEGIN_DISCORD_LIVE_UPDATES"
-  managed_block_end: "# END_DISCORD_LIVE_UPDATES"
+  extra_instructions: |
+    Keep labels concise and imperative.
+    Use "No Action" only when there is clearly no hand/object interaction.
+    If floor mat vs table is unclear, do not guess raised furniture; use neutral location wording.
