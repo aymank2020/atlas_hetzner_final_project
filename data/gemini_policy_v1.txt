@@ -112,11 +112,13 @@
 - Label all actions and pauses within each segment
 - No penalties for past work before this change
 
-### Hold Rule Enforcement (jujumu007 + austin._._0, 2026-03-27)
-- "hold" is REQUIRED when ego holds an object NOT referenced elsewhere in the label
-- Example: ego holds wrench + picks up cup -> "pick up cup, hold wrench"
-- "pick up cup" does NOT need "hold cup" (redundant)
-- Each segment is independent: next segment doesn't know previous context
+### Hold Rule Enforcement (jujumu007 + austin._._0, 2026-03-27 & Update 2026-05-14)
+- "hold" is REQUIRED when ego holds an object NOT referenced elsewhere in the label.
+- KEY RULE: Only add "hold" when the held object is NOT already captured in another action in that same segment.
+- Example 1: Ego holds cup + picks up cloth -> "pick up cloth, hold cup" (Cup is not in 'pick up cloth').
+- Example 2: Ego wipes cup with cloth -> "wipe cup with cloth" (NOT "hold cup, wipe cup with cloth").
+- Why: The cup is already included in "wipe cup with cloth", so adding "hold cup" is redundant and forbidden.
+- Each segment is independent: next segment doesn't know previous context.
 - Exception: when pick up and place happen in ~1 second, can combine
 
 ### Atomic Action Limit (m.xssx, 2026-03-28)
