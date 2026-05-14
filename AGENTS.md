@@ -174,6 +174,22 @@ To trace a broken segment end-to-end:
 4. Inspect `policy_gate` decision
 5. Inspect final pre-submit guard output
 
+## UI & Authentication Resilience
+
+### 1. Desktop Overlay Bypass (Surgery)
+The Atlas UI aggressively blocks non-desktop viewports via a persistent `z-[9999]` overlay.
+- **Persistence**: Managed via `MutationObserver` and injected CSS in `src/infra/browser_auth.py`.
+- **Force Desktop**: Page headers (User-Agent) and Viewport (1920x1080) are forced in `legacy_impl.py` to satisfy server-side and client-side checks.
+
+### 2. Interaction Strategy (Aggressive Clicks)
+Standard Playwright `click()` may fail due to invisible layout containers or DOM interception.
+- **Strategy**: `src/infra/browser_auth.py` uses a JS-based fallback (`evaluate("el => el.click()")`) for critical buttons (Start, Verify).
+- **Selectors**: Always use the broadest possible selectors for auth buttons to handle text/SVG changes.
+
+### 3. Automated OTP (Gmail IMAP)
+Auth requires a 6-digit OTP fetched via Gmail IMAP.
+- **Sync**: Uses `started_at` unix timestamps and `min_uid` watermark to ensure the *correct* current OTP is used, avoiding stale codes from previous runs.
+
 ## What To Preserve
 
 - Fail-closed submit behavior
@@ -181,6 +197,8 @@ To trace a broken segment end-to-end:
 - Raw Gemini response persistence before parsing
 - Task-scoped cache cleanup between episodes
 - Compatibility aliases in `legacy_impl.py`
+- **JS-based Click Fallbacks**: Do not remove, as they bypass Playwright's strict visibility/interception checks which often fail on Atlas.
+- **Hold Policy Rule**: "hold" is only needed if the object is NOT mentioned in another action within the same segment.
 
 ## Windows Compatibility
 
@@ -195,7 +213,9 @@ The codebase is cross-platform and runs on Windows natively:
 
 ## What Not To Assume
 
-- Gemini timestamps are NOT reliable
-- DOM is NOT stable immediately after UI actions
-- One chat request does NOT equal one chat session
-- `legacy_impl.py` comments may NOT reflect the real runtime path
+- Gemini timestamps are NOT reliable.
+- DOM is NOT stable immediately after UI actions.
+- One chat request does NOT equal one chat session.
+- `legacy_impl.py` comments may NOT reflect the real runtime path.
+- **Standard Clicks**: Do NOT assume a standard `locator.click()` will work even if the element is "visible"; Atlas has complex layering.
+- **Hold labels**: Do NOT assume every held object needs a separate "hold" label if it's implicitly held during another action (e.g., "wipe cup").
