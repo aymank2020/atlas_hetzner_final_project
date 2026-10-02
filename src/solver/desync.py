@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
@@ -105,6 +106,25 @@ def compare_segment_snapshots(
 
     blocking: List[str] = []
     warnings: List[str] = []
+
+    # Matching corrupt snapshots must never count as evidence of safe UI state.
+    for name, snapshot in (("live DOM", live_snapshot), ("source snapshot", source_snapshot)):
+        if not snapshot.segments:
+            blocking.append(f"{name} contains no segments")
+        seen = set()
+        for segment in snapshot.segments:
+            idx = int(segment.get("segment_index", 0) or 0)
+            if idx <= 0:
+                blocking.append(f"{name} contains an invalid segment index: {idx}")
+            if idx in seen:
+                blocking.append(f"{name} contains duplicate segment index: {idx}")
+            seen.add(idx)
+            start = _safe_float(segment.get("start_sec"), float("nan"))
+            end = _safe_float(segment.get("end_sec"), float("nan"))
+            if not math.isfinite(start) or not math.isfinite(end):
+                blocking.append(f"{name} segment {idx}: timestamps must be finite numbers")
+            elif start < 0 or end <= start:
+                blocking.append(f"{name} segment {idx}: invalid timestamp interval {start}-{end}s")
 
     live_only = sorted(idx for idx in live_by_idx if idx not in source_by_idx)
     source_only = sorted(idx for idx in source_by_idx if idx not in live_by_idx)
